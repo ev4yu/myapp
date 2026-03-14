@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diabetes Insights: Sentiment Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e07a5f;
+      --secondary: #3d405b;
+      --accent1: #81b29a;
+      --accent2: #f2cc8f;
+      --accent3: #f4f1de;
+      --background: #f5f5dc;
+      --text: #3d405b;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'VT323', monospace;
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary);
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.8rem;
+      border-bottom: 4px solid var(--secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    header::before, header::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+      animation: spin 4s infinite linear;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    header::before {
+      top: 10px;
+      left: 10px;
+    }
+
+    header::after {
+      top: 10px;
+      right: 10px;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .hero {
+      background-color: #f2cc8f;
+      border: 3px solid #3d405b;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0 #aaa;
+      text-align: center;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .hero h1 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .intro-blurb {
+      background-color: var(--accent1);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      margin-top: 2rem;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .intro-blurb::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(242, 204, 143, 0.5) 0%, transparent 70%);
+    }
+
+    .toc {
+      background-color: var(--accent3);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .toc::before {
+      content: '≡';
+      position: absolute;
+      top: -15px;
+      right: 20px;
+      background: var(--accent2);
+      color: var(--secondary);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      border: 2px solid var(--secondary);
+    }
+
+    .toc h2 {
+      margin-top: 0;
+      color: var(--secondary);
+      text-align: center;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      border-bottom: 2px dashed var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+
+    .toc ul {
+      padding-left: 1.5rem;
+      list-style: none;
+    }
+
+    .toc li {
+      margin-bottom: 0.8rem;
+      position: relative;
+      padding-left: 1.5rem;
+    }
+
+    .toc li:before {
+      content: '>';
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-family: 'Courier New', Courier, monospace;
+      font-weight: bold;
+    }
+
+    .toc a {
+      color: var(--secondary);
+      text-decoration: none;
+      transition: all 0.3s ease;
+      display: block;
+      padding: 0.3rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .toc a:hover {
+      color: var(--primary);
+      background: rgba(0, 0, 0, 0.05);
+      transform: translateX(5px);
+    }
+
+    .toc .submenu {
+      margin-left: 1rem;
+      margin-top: 0.5rem;
+      border-left: 2px solid var(--primary);
+      padding-left: 1rem;
+    }
+
+    /* Dropdown menu styles */
+    .dropdown-container {
+      position: relative;
+      list-style: none;
+      margin: 0.8rem 0;
+    }
+
+    .dropdown-button {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      background-color: var(--accent1);
+      color: white;
+      border: 2px solid var(--secondary);
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-button:hover {
+      background-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    .dropdown-arrow {
+      font-size: 0.8rem;
+      transition: transform 0.3s ease;
+    }
+
+    .dropdown-menu {
+      display: none;
+      background-color: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 6px;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .dropdown-menu.show {
+      display: block;
+    }
+
+    .dropdown-container.active .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .collapsible {
+      background-color: var(--accent1);
+      color: white;
+      cursor: pointer;
+      padding: 1.2rem;
+      width: 100%;
+      border: none;
+      text-align: left;
+      outline: none;
+      font-size: 1.2rem;
+      font-family: 'VT323', monospace;
+      margin-bottom: 0.5rem;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      border: 2px solid var(--secondary);
+    }
+
+    .collapsible span {
+      position: relative;
+      z-index: 2;
+    }
+
+    .collapsible::after {
+      content: '\002B';
+      color: white;
+      font-weight: bold;
+      font-size: 1.5rem;
+      position: relative;
+      z-index: 2;
+      transition: all 0.3s ease;
+    }
+
+    .active::after {
+      content: "\2212";
+      transform: rotate(180deg);
+    }
+
+    .active, .collapsible:hover {
+      background-color: var(--primary);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .content {
+      padding: 0 1.2rem;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+      background-color: var(--accent3);
+      margin-bottom: 1rem;
+      border-radius: 0 0 6px 6px;
+      border: 2px solid var(--secondary);
+      border-top: none;
+    }
+
+    .content p {
+      margin: 1rem 0;
+      font-size: 1.1rem;
+    }
+
+    .source {
+      font-style: italic;
+      color: var(--secondary);
+      margin-top: 1.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--secondary);
+      font-size: 0.9rem;
+    }
+
+    .source a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .source a:hover {
+      text-decoration: underline;
+    }
+
+    .wordcloud-container {
+      background-color: var(--accent3);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .wordcloud-container h2 {
+      color: var(--secondary);
+      text-align: center;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      margin-top: 0;
+      border-bottom: 2px dashed var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+
+    iframe {
+      max-width: 100%;
+      border: none;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      margin: 1.5rem 0;
+      border: 2px solid var(--secondary);
+      border-radius: 4px;
+    }
+
+    .chart-container {
+      margin: 2rem 0;
+      background-color: var(--accent3);
+      padding: 1rem;
+      border-radius: 8px;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-title {
+      text-align: center;
+      margin-bottom: 1rem;
+      font-weight: bold;
+      color: var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+    }
+
+    .chart-bar {
+      display: flex;
+      height: 30px;
+      margin-bottom: 8px;
+      font-family: 'Courier New', Courier, monospace;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .bar-segment {
+      height: 100%;
+      text-align: center;
+      color: #fff;
+      line-height: 30px;
+      font-size: 0.8rem;
+      transition: width 0.5s ease;
+    }
+    
+    .positive { background-color: var(--primary); }
+    .neutral { background-color: var(--accent1); }
+    .negative { background-color: var(--secondary); }
+
+    /* Make neutral bar text readable on light background */
+    .bar-segment.neutral {
+      color: #1e2b2e;
+      font-weight: bold;
+    }
+
+    .chart-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 0.5rem;
+      font-size: 0.8rem;
+      color: var(--secondary);
+    }
+
+    .sentiment-summary {
+      background-color: var(--accent1);
+      padding: 1rem;
+      border-radius: 8px;
+      margin: 1.5rem 0;
+      color: white;
+      border-left: 4px solid var(--secondary);
+    }
+
+    .sentiment-summary h3 {
+      margin-top: 0;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      color: #3d405b;
+      background-color: #d0f0c0; /* muted green */
+      border: 2px solid #556b2f;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+    .back-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: #c0e0a0;
+      color: #fff;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: var(--secondary);
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: 600;
+      margin-top: auto;
+      border-top: 4px solid var(--accent2);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    .pixel-divider::before {
+      left: 20%;
+    }
+    .pixel-divider::after {
+      right: 20%;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.4rem;
+        padding: 1rem;
+      }
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+      .toc, .intro-blurb, .wordcloud-container {
+        padding: 1rem;
+      }
+    }
+
+    /* Loading spinner and error styles */
+    #loadingIndicator div:first-child {
+      display: inline-block;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #errorMessage {
+      background-color: #ff4444;
+      color: white;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Sentiment Analysis
+    <a href="/" class="back-btn">🏠 Home</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Community Voices on Diabetes</h1>
+      <p>Explore personal stories, sentiment analysis, and community insights about living with diabetes.</p>
+    </section>
+
+    <div class="intro-blurb">
+      <h2 style="font-family: 'Press Start 2P', cursive;">About This Project</h2>
+      <p>This interactive dashboard presents sentiment analysis of diabetes-related blogs and personal stories. We've analyzed content from various online communities to understand the emotional landscape of living with diabetes. Explore the word cloud, sentiment charts, and excerpts from personal stories below to gain insights into the diabetes experience.</p>
+    </div>
+
+    <!-- ========== UPDATED TOC WITH LIVE TOOL LINK ========== -->
+    <div class="toc">
+      <h2>Navigation Menu</h2>
+      <ul>
+        <li><a href="#live-analysis">Live Sentiment Tool</a></li>
+        <li><a href="#wordcloud">Diabetes Word Cloud</a></li>
+        <li class="dropdown-container">
+          <button class="dropdown-button">
+            Personal Stories (Excerpts) & Analysis <span class="dropdown-arrow">▼</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><a href="#story1">Personal Reflection</a></li>
+            <li><a href="#story2">Mental Health & Support</a></li>
+            <li><a href="#story3">Traveling with Diabetes</a></li>
+            <li><a href="#story4">Diagnosis to Advocacy</a></li>
+            <li><a href="#story5">Parent's Perspective</a></li>
+            <li><a href="#story6">Blogging Community</a></li>
+            <li><a href="#story7">Long-term Experience</a></li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+
+    <!-- ========== LIVE ANALYSIS (color white removed) ========== -->
+    <div class="wordcloud-container" id="live-analysis" style="background-color: var(--accent1);">
+      <h2 style="color: white; border-bottom-color: white;">Try Live BERT Analysis</h2>
+      <p style="text-align: center; font-family: 'Courier New', monospace;">Paste a story or thought below to see how our model scores the sentiment.</p>
+      
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+        <textarea id="liveInput" placeholder="Enter text here..." 
+          style="width: 90%; height: 100px; font-family: 'VT323'; font-size: 1.2rem; padding: 10px; border: 3px solid var(--secondary); border-radius: 8px;"></textarea>
+        
+        <button onclick="runLiveAnalysis()" id="analyzeBtn" class="back-btn" style="position: static; background-color: var(--accent2); color: var(--secondary); border: 2px solid var(--secondary);">
+          RUN ANALYSIS
+        </button>
+
+        <!-- Loading indicator (hidden by default) -->
+        <div id="loadingIndicator" style="display: none; text-align: center; padding: 1rem;">
+          <div></div>
+          <p style="margin-top: 0.5rem; color: white;">Analyzing sentiment...</p>
+        </div>
+
+        <!-- Error message (hidden by default) -->
+        <div id="errorMessage" style="display: none; background-color: #ff4444; color: white; padding: 0.5rem 1rem; border-radius: 4px; width: 90%; text-align: center;">
+          ⚠️ <span id="errorText">Error occurred</span>
+        </div>
+
+        <div id="liveResults" class="chart-container" style="display: none; width: 90%; background-color: white; color: var(--secondary);">
+          <div class="chart-title">AI Prediction Results</div>
+
+          <!-- Three bars -->
+          <div class="chart-bar">
+            <div id="live-pos" class="bar-segment positive" style="width: 0%;">Pos</div>
+            <div id="live-neu" class="bar-segment neutral" style="width: 0%;">Neu</div>
+            <div id="live-neg" class="bar-segment negative" style="width: 0%;">Neg</div>
+          </div>
+
+          <!-- Labels -->
+          <div class="chart-labels">
+            <span id="pos-label">Positive: 0%</span>
+            <span id="neu-label">Neutral: 0%</span>
+            <span id="neg-label">Negative: 0%</span>
+          </div>
+
+          <!-- Category message -->
+          <div id="sentimentCategory" style="text-align: center; margin-top: 1rem; font-family: 'Press Start 2P', cursive; font-size: 0.7rem;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <div class="wordcloud-container" id="wordcloud">
+      <h2>Diabetes Community Word Cloud</h2>
+      <p>This interactive visualization shows the most frequently used words in diabetes community discussions, blogs/forums, and articles scoured from the Internet. Larger words indicate higher frequency of use.</p>
+      <iframe loading="lazy" style="width:100%; height:600px;" src="https://cdn.wordart.com/iframe/r0hxsb765zqt"></iframe>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <h2 id="stories" style="color: var(--secondary); text-align: center; font-family: 'Press Start 2P', cursive;">Personal Stories & Sentiment Analysis</h2>
+
+    <button type="button" class="collapsible" id="story1"><span>Personal Reflection on Type 1 Diabetes</span></button>
+    <div class="content">
+      <p>One year ago, at the age of 25, I was diagnosed with Type 1 Diabetes. It was a shock to say the least, and I was filled with fear and uncertainty about what the future would hold. The first few months were definitely the toughest. I struggled with insulin management, constantly felt fatigued, and had trouble getting a handle on my blood sugar levels. But with the help of my endocrinologist and support from my friends and family, I was able to get the hang of things and find a routine that worked for me.</p>
+      <p>One of the biggest challenges I faced was balancing my active lifestyle with my diabetes management. I love to stay active and go on hikes, but I quickly realized that physical activity can greatly affect my blood sugar levels. It took some time, but I eventually figured out how to properly plan and prepare for these activities so that I could safely enjoy them without worrying about my diabetes.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This personal reflection shows a progression from negative emotions (fear, uncertainty, struggle) to positive resolution (finding a routine, overcoming challenges).</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 50%;">Positive (50%)</div>
+          <div class="bar-segment neutral" style="width: 30%;">Neutral (30%)</div>
+          <div class="bar-segment negative" style="width: 20%;">Negative (20%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://medium.com/@haikabajwa112233/reflecting-on-type-1-diabetes-88c3b2451afc" target="_blank">Medium Blog – Personal Diabetes Journey</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story2"><span>Mental Health & Community Support</span></button>
+    <div class="content">
+      <p>Another important aspect of managing my Type 1 Diabetes has been mental health. Dealing with a chronic condition can be overwhelming at times, and it's important to remember to take care of oneself emotionally as well as physically. I've found that talking to others who are in similar situations and connecting with the diabetes community has been incredibly helpful and therapeutic for me.</p>
+      <p>Looking back on the past year, I am grateful for the challenges and growth that my diagnosis has brought into my life. I have become more knowledgeable about my body and have learned to be more mindful of my health. I am confident in my ability to manage my diabetes and live a fulfilling life, and I am excited to see what the future holds.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This section demonstrates a strongly positive outlook, emphasizing gratitude, growth, and confidence despite the challenges of diabetes management.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 70%;">Positive (70%)</div>
+          <div class="bar-segment neutral" style="width: 20%;">Neutral (20%)</div>
+          <div class="bar-segment negative" style="width: 10%;">Negative (10%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://medium.com/@haikabajwa112233/reflecting-on-type-1-diabetes-88c3b2451afc" target="_blank">Medium Blog – Personal Diabetes Journey</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story3"><span>Traveling with Type 1 Diabetes</span></button>
+    <div class="content">
+      <p>Traveling with type 1 diabetes means packing more than just clothes: it takes careful planning, smart routines, and a few game-changing tricks. From insulated bags to backup supplies and lessons learned from the diabetes community, the tips and habits that help include keeping insulin safe, blood glucose stable, and travel stress-free.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This practical guide has a neutral to positive tone, focusing on solutions and strategies rather than emotional challenges.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 40%;">Positive (40%)</div>
+          <div class="bar-segment neutral" style="width: 50%;">Neutral (50%)</div>
+          <div class="bar-segment negative" style="width: 10%;">Negative (10%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://www.dedoc.org/blog" target="_blank">dedoc° Blog</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story4"><span>From Diagnosis to Advocacy</span></button>
+    <div class="content">
+      <p>When one person was diagnosed with Type 1 Diabetes in 2018, they faced isolation and stigma, but then a simple call to change the name of a local association evolved into a larger mission of representation, education, and mentorship. From joining the board of a diabetes association to mentoring new advocates, their story is a powerful reminder of how connection, community, and courage can turn a diagnosis into a platform for lasting change. For the first time, they felt part of a larger community dedicated to making life better for people with diabetes.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This inspiring story shows a journey from negative experiences (isolation, stigma) to positive community engagement and advocacy.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 60%;">Positive (60%)</div>
+          <div class="bar-segment neutral" style="width: 20%;">Neutral (20%)</div>
+          <div class="bar-segment negative" style="width: 20%;">Negative (20%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://www.dedoc.org/blog" target="_blank">dedoc° Blog</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story5"><span>A Parent's Perspective</span></button>
+    <div class="content">
+      <p>Another reflection shares the journey from the shock of a child's type 1 diabetes diagnosis to becoming an empowered advocate. With wit, warmth, and hard-won insight, it traces the transformative impact of community, technology, and psychological support in diabetes care. Success depended on understanding the condition and seeking out those living with it. Over time, the parent stepped back as their daughter found her own peer support and her 'tribe' within the diabetes community, which made an enormous difference to her sense of worth and belonging and ensures she is never alone.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This emotional account shows a progression from initial shock to empowerment, with strong positive elements related to community support.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 65%;">Positive (65%)</div>
+          <div class="bar-segment neutral" style="width: 15%;">Neutral (15%)</div>
+          <div class="bar-segment negative" style="width: 20%;">Negative (20%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10041872/" target="_blank">PMC Article – Type 1 Diabetes Experience</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story6"><span>Diabetes Blogging Community</span></button>
+    <div class="content">
+      <p>Diabetes blogs have been around for a long time, featuring articles and opinion pieces written by an international network of diabetes advocates. They cover everything from scientific conferences to the latest diabetes research and technology, from challenges faced by those living with diabetes to global disparities in healthcare. These voices provide honest and thought-provoking posts, excelling at dispelling myths and working towards stopping diabetes stigma.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This overview of the diabetes blogging community has a neutral to positive tone, focusing on education and advocacy.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 55%;">Positive (55%)</div>
+          <div class="bar-segment neutral" style="width: 40%;">Neutral (40%)</div>
+          <div class="bar-segment negative" style="width: 5%;">Negative (5%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://www.ascensia.com/community/blog/" target="_blank">Ascensia Community Blog</a></p>
+    </div>
+
+    <button type="button" class="collapsible" id="story7"><span>Long-term Experience with Diabetes</span></button>
+    <div class="content">
+      <p>I could never, during my first few decades with diabetes, have envisioned how this journey would go. I had no thought to write about diabetes, lecture about diabetes, or give workshops to health professionals about diabetes. No, indeed. I barely spoke of my diabetes, to anyone. I didn't know anyone with diabetes and I didn't think anyone could understand the micro-management type 1 diabetes requires. It wasn't until I was thirty-eight years old that I began to let a few people in. These stories illustrate the common threads of learning, adaptation, and mutual support in diabetes communities, highlighting shared experiences and the emotional support that peers provide to one another.</p>
+      
+      <div class="sentiment-summary">
+        <h3>Sentiment Analysis</h3>
+        <p>This reflective piece shows a journey from isolation to connection, with a mix of emotions but ultimately a positive outlook on community support.</p>
+      </div>
+      
+      <div class="chart-container">
+        <div class="chart-title">Sentiment Distribution</div>
+        <div class="chart-bar">
+          <div class="bar-segment positive" style="width: 60%;">Positive (60%)</div>
+          <div class="bar-segment neutral" style="width: 25%;">Neutral (25%)</div>
+          <div class="bar-segment negative" style="width: 15%;">Negative (15%)</div>
+        </div>
+        
+        <div class="chart-labels">
+          <div>Positive Sentiment</div>
+          <div>Neutral Sentiment</div>
+          <div>Negative Sentiment</div>
+        </div>
+      </div>
+      
+      <p class="source">Source: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10041872/" target="_blank">PMC Article – Type 1 Diabetes Experience</a></p>
+    </div>
+  </main>
+
+  <footer>
+    Created by Eva Yu · STEM League Tech Innovators Internship · 2025
+  </footer>
+
+  <script>
+    // Collapsible sections
+    var coll = document.getElementsByClassName("collapsible");
+    for (var i = 0; i < coll.length; i++) {
+      coll[i].addEventListener("click", function() {
+        this.classList.toggle("active");
+        var content = this.nextElementSibling;
+        if (content.style.maxHeight){
+          content.style.maxHeight = null;
+        } else {
+          content.style.maxHeight = content.scrollHeight + "px";
+        } 
+      });
+    }
+    
+    // Dropdown menu functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const dropdownButton = document.querySelector('.dropdown-button');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+      const dropdownContainer = document.querySelector('.dropdown-container');
+      
+      if (dropdownButton) {
+        dropdownButton.addEventListener('click', function(e) {
+          e.stopPropagation();
+          dropdownMenu.classList.toggle('show');
+          dropdownContainer.classList.toggle('active');
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+          if (!dropdownContainer.contains(event.target)) {
+            dropdownMenu.classList.remove('show');
+            dropdownContainer.classList.remove('active');
+          }
+        });
+        
+        // Close dropdown when a menu item is clicked
+        dropdownMenu.addEventListener('click', function(e) {
+          if (e.target.tagName === 'A') {
+            dropdownMenu.classList.remove('show');
+            dropdownContainer.classList.remove('active');
+          }
+        });
+      }
+      
+      // Open first story by default
+      if (document.querySelector(".collapsible")) {
+        document.querySelector(".collapsible").click();
+      }
+      
+      // initial chart animation
+      setTimeout(animateCharts, 500);
+    });
+    
+    // Animate chart bars
+    function animateCharts() {
+      const bars = document.querySelectorAll('.bar-segment');
+      bars.forEach(bar => {
+        const width = bar.style.width;
+        bar.style.width = '0';
+        setTimeout(() => {
+          bar.style.width = width;
+        }, 100);
+      });
+    }
+    
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const targetId = this.getAttribute('href');
+        if (targetId === '#') return;
+        
+        const targetElement = document.querySelector(targetId);
+        if (targetElement) {
+          // If it's a collapsible section, open it first
+          if (targetId.startsWith('#story')) {
+            const collapsible = document.querySelector(`button${targetId}`);
+            if (collapsible && !collapsible.classList.contains('active')) {
+              collapsible.click();
+            }
+          }
+          
+          window.scrollTo({
+            top: targetElement.offsetTop - 20,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+
+    // Updated runLiveAnalysis with correct backend URL
+    async function runLiveAnalysis() {
+      const text = document.getElementById('liveInput').value.trim();
+      const resultsDiv = document.getElementById('liveResults');
+      const posBar = document.getElementById('live-pos');
+      const neuBar = document.getElementById('live-neu');
+      const negBar = document.getElementById('live-neg');
+      const posLabel = document.getElementById('pos-label');
+      const neuLabel = document.getElementById('neu-label');
+      const negLabel = document.getElementById('neg-label');
+      const categoryDiv = document.getElementById('sentimentCategory');
+      const analyzeBtn = document.getElementById('analyzeBtn');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const errorMessage = document.getElementById('errorMessage');
+      const errorText = document.getElementById('errorText');
+
+      // Reset UI
+      resultsDiv.style.display = 'none';
+      errorMessage.style.display = 'none';
+
+      if (!text) {
+        errorText.innerText = "Please enter text to analyze!";
+        errorMessage.style.display = 'block';
+        setTimeout(() => errorMessage.style.display = 'none', 3000);
+        return;
+      }
+
+      loadingIndicator.style.display = 'block';
+      analyzeBtn.disabled = true;
+      analyzeBtn.style.opacity = '0.5';
+
+      try {
+        const response = await fetch('http://localhost:5000/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        console.log('Sentiment result:', data);
+
+        if (data.status === 'success') {
+          resultsDiv.style.display = 'block';
+
+          posBar.style.width = '0%';
+          neuBar.style.width = '0%';
+          negBar.style.width = '0%';
+
+          setTimeout(() => {
+            posBar.style.width = data.positive + '%';
+            neuBar.style.width = data.neutral + '%';
+            negBar.style.width = data.negative + '%';
+
+            posBar.innerText = data.positive + '%';
+            neuBar.innerText = data.neutral + '%';
+            negBar.innerText = data.negative + '%';
+
+            posLabel.innerText = 'Positive: ' + data.positive + '%';
+            neuLabel.innerText = 'Neutral: ' + data.neutral + '%';
+            negLabel.innerText = 'Negative: ' + data.negative + '%';
+          }, 50);
+
+          const category = data.category;
+          let categoryText = '';
+          if (category === 'positive') categoryText = '😊 Overall positive';
+          else if (category === 'negative') categoryText = '😔 Overall negative';
+          else if (category === 'neutral') categoryText = '😐 Overall neutral';
+          else categoryText = '🔄 Mixed feelings';
+          categoryDiv.innerText = categoryText;
+        } else {
+          throw new Error('Analysis failed');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        errorText.innerText = `Error: ${error.message}. Is Flask running on port 5000?`;
+        errorMessage.style.display = 'block';
+      } finally {
+        loadingIndicator.style.display = 'none';
+        analyzeBtn.disabled = false;
+        analyzeBtn.style.opacity = '1';
+      }
+    }
+  </script>
+</body>
+</html>

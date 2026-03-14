@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diabetes Insights</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'VT323', monospace;
+      background-color: #f5f5dc;
+      color: #3d405b;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background-color: #e07a5f;
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.8rem;
+      border-bottom: 4px solid #3d405b;
+      box-shadow: 4px 4px 0 #aaa;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .hero {
+      background-color: #f2cc8f;
+      border: 3px solid #3d405b;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0 #aaa;
+      text-align: center;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    .hero h1 {
+      font-family: 'Press Start 2P', cursive;
+      color: #556b2f;
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1rem;
+      color: #3d405b;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+
+    .card {
+      border: 2px solid #3d405b;
+      border-radius: 8px;
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: 4px 4px 0 #aaa;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 100%;
+      font-weight: 600;
+      background-color: #fff8dc;
+    }
+
+    .card h2 {
+      font-family: 'Press Start 2P', cursive;
+      margin-bottom: 0.5rem;
+    }
+
+    .ml-btn-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.7rem;
+    }
+
+    .ml-btn-label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      font-size: 1.2rem;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: 700;
+      color: #3d405b;
+      margin-bottom: 0.2rem;
+      letter-spacing: 0.01em;
+    }
+
+    .ml-btn-emoji {
+      font-size: 2.4rem;
+      line-height: 1;
+      margin-bottom: 0.1em;
+      display: block;
+      text-align: center;
+    }
+
+    .card p {
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .cute-btn {
+      display: inline-block;
+      padding: 0.8rem 1.5rem;
+      background-color: #d0f0c0;
+      color: #3d405b;
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 0.9rem;
+      border: 2px solid #556b2f;
+      border-radius: 4px;
+      box-shadow: 2px 2px 0 #aaa;
+      cursor: pointer;
+      text-decoration: none;
+      transition: transform 0.1s;
+    }
+
+    .cute-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: #c0e0a0;
+      color: #fff;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: #3d405b;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: 600;
+      margin-top: auto;
+      border-top: 4px solid #aaa;
+      box-shadow: 4px -4px 0 #aaa;
+    }
+
+    @keyframes bob {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+
+    /* Game Launch Container Styles */
+    .divider-button {
+      display: flex;
+      justify-content: center;
+      margin: 40px 0 20px 0;
+    }
+    .divider-button img {
+      width: 400px;
+      height: auto;
+      cursor: pointer;
+    }
+
+    .game-launch-container {
+      background-color: #556b2f;
+      border: 3px solid #3d405b;
+      border-radius: 12px;
+      padding: 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+      box-shadow: 6px 6px 0 #aaa;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.2); opacity: 0.7; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .game-title {
+      font-family: 'Press Start 2P', cursive;
+      color: white;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 0 #3d405b;
+    }
+
+    .game-description {
+      font-family: 'Courier New', Courier, monospace;
+      color: white;
+      margin-bottom: 1.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .game-btn {
+      display: inline-block;
+      padding: 1rem 2rem;
+      background-color: #e07a5f;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      border: 3px solid #3d405b;
+      border-radius: 8px;
+      box-shadow: 4px 4px 0 #888;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .game-btn:hover {
+      transform: translate(-3px, -3px);
+      box-shadow: 6px 6px 0 #666;
+      background-color: #d86a50;
+    }
+
+    .game-btn:active {
+      transform: translate(1px, 1px);
+      box-shadow: 2px 2px 0 #888;
+    }
+
+    .game-btn::after {
+      content: '🎮';
+      position: absolute;
+      right: -20px;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .game-btn:hover::after {
+      right: 15px;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Diabetes Insights: A Data Journey
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Predictive Modeling + Real Stories</h1>
+      <p>
+        Discover how machine learning and community voices can help us better understand diabetes risk. Explore trends, try the risk predictor, and learn through fun, interactive visualizations!
+      </p>
+    </section>
+
+    <section class="features">
+      <div class="card">
+        <div class="ml-btn-container">
+          <span class="ml-btn-label">ML Risk Predictor</span>
+          <span class="ml-btn-emoji">🤖</span>
+          <a href="/model" class="cute-btn">✨ Click to Try! ✨</a>
+        </div>
+        <p style="margin-top:1rem;">Enter your info to find out your diabetes risk instantly.</p>
+      </div>
+
+      <div class="card">
+        <div class="ml-btn-container">
+          <span class="ml-btn-label">Global Trends</span>
+          <span class="ml-btn-emoji">📈</span>
+          <a href="/trends" class="cute-btn">📊 View Graphs</a>
+        </div>
+
+        <p style="margin-top:1rem;">See how diabetes affects different ages, regions, and genders worldwide.</p>
+      </div>
+
+      <div class="card">
+        <div class="ml-btn-container">
+          <span class="ml-btn-label">Sentiment Analysis</span>
+          <span class="ml-btn-emoji">💬</span>
+          <a href="/sentiment" class="cute-btn">✨ Explore! ✨</a>
+        </div>
+        <p style="margin-top:1rem;">See what real diabetes communities are saying through our word cloud and sentiment charts.</p>
+      </div>
+    </section>
+
+
+<!-- Divider Button -->
+<div class="divider-button">
+<a href="#game">
+
+</a>
+</div>
+    <!-- Game Launch Container -->
+    <div id="game" class="game-launch-container">
+      <h2 class="game-title">DAY-IN-THE-LIFE: DIABETES CHOICES</h2>
+      <p class="game-description">Experience a day managing diabetes through interactive choices. Make decisions about food, activity, and medication while tracking your glucose, energy, and stress levels.</p>
+      <a href="/game" class="game-btn">LAUNCH GAME</a>
+    </div>
+  </main>
+
+  <footer>
+    Created by Eva Yu · STEM League Tech Innovators Internship · 2025
+  </footer>
+</body>
+</html>

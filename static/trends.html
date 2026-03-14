@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Diabetes Trends</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+  <style>
+    :root {
+      --primary: #e07a5f;
+      --secondary: #3d405b;
+      --accent1: #81b29a;
+      --accent2: #f2cc8f;
+      --accent3: #f4f1de;
+      --background: #f5f5dc;
+      --text: #3d405b;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'VT323', monospace;
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary);
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.8rem;
+      border-bottom: 4px solid var(--secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+      animation: headerGlow 3s infinite alternate;
+    }
+
+    @keyframes headerGlow {
+      0% { box-shadow: 0 4px 12px rgba(224, 122, 95, 0.4); }
+      100% { box-shadow: 0 4px 20px rgba(224, 122, 95, 0.8); }
+    }
+
+    header::before, header::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+      animation: spin 4s infinite linear;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    header::before {
+      top: 10px;
+      left: 10px;
+    }
+
+    header::after {
+      top: 10px;
+      right: 10px;
+    }
+
+    .back-btn {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      background-color: #d0f0c0;
+      border: 2px solid #556b2f;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+    .back-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: #c0e0a0;
+      color: #fff;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex: 1;
+    }
+
+    .hero {
+      background-color: var(--accent2);
+      border: 3px solid var(--secondary);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0 #aaa;
+      text-align: center;
+      margin-bottom: 2rem;
+      position: relative;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+
+    .hero h1 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .intro-blurb {
+      background-color: var(--accent1);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      color: white;
+    }
+
+    .intro-blurb::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(242, 204, 143, 0.5) 0%, transparent 70%);
+    }
+
+    .intro-blurb h2 {
+      margin-top: 0;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      border-bottom: 2px dashed white;
+      padding-bottom: 0.5rem;
+    }
+
+    .chart-container {
+      background-color: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      max-width: 95%;
+      margin: 1.5rem auto;
+      position: relative;
+      transition: transform 0.3s ease;
+    }
+
+    .chart-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .chart-box {
+      height: 400px;
+      margin-bottom: 1rem;
+    }
+
+    .chart-info {
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 8px;
+      padding: 1rem;
+      font-size: 0.9rem;
+    }
+
+    .chart-info h3 {
+      color: var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      margin-top: 0;
+      border-bottom: 2px dashed var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+
+    .chart-info ul {
+      margin: 0.5rem 0;
+      padding-left: 1.2rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .chart-info li {
+      margin-bottom: 0.5rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .info-button {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: var(--secondary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 14px;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+
+    .info-button:hover {
+      transform: translate(-1px, -1px);
+      background-color: var(--primary);
+      box-shadow: 3px 3px 0 #888;
+      animation: none;
+    }
+
+    .chart-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 1.5rem 0;
+      flex-wrap: wrap;
+    }
+
+    .chart-buttons button {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      color: var(--secondary);
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 6px;
+      padding: 0.7rem 1rem;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .chart-buttons button:hover {
+      transform: translate(-2px, -2px);
+      background-color: var(--accent1);
+      color: white;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    .chart-buttons button.active {
+      background-color: var(--primary);
+      color: white;
+      box-shadow: 4px 4px 0 #888;
+      animation: activePulse 1.5s infinite;
+    }
+
+    @keyframes activePulse {
+      0% { box-shadow: 4px 4px 0 #888; }
+      50% { box-shadow: 4px 4px 10px rgba(224, 122, 95, 0.8); }
+      100% { box-shadow: 4px 4px 0 #888; }
+    }
+
+    .define {
+      text-decoration: underline dotted;
+      cursor: pointer;
+      color: var(--secondary);
+      position: relative;
+      display: inline-block;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+
+    .define:hover {
+      color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .definition-popup {
+      display: none;
+      position: absolute;
+      background: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 6px;
+      padding: 0.7rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9rem;
+      max-width: 250px;
+      z-index: 100;
+      box-shadow: 3px 3px 0 #aaa;
+      left: 0;
+      top: 100%;
+      margin-top: 5px;
+      color: var(--secondary);
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .definition-popup.active {
+      display: block;
+    }
+
+    .pixel-divider {
+      height: 4px;
+      background: var(--accent2);
+      margin: 2rem 0;
+      position: relative;
+      border: 2px solid var(--secondary);
+      border-left: none;
+      border-right: none;
+    }
+
+    .pixel-divider::before,
+    .pixel-divider::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      width: 16px;
+      height: 16px;
+      background: var(--primary);
+      border: 2px solid var(--secondary);
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .pixel-divider::before {
+      left: 20%;
+    }
+
+    .pixel-divider::after {
+      right: 20%;
+    }
+
+    .interactive-quiz {
+      background-color: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 12px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      text-align: center;
+    }
+
+    .interactive-quiz h3 {
+      color: var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      margin-top: 0;
+    }
+
+    .quiz-stats {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    .quiz-question {
+      margin-bottom: 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 1.1rem;
+      font-weight: bold;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .quiz-option {
+      padding: 0.8rem;
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Courier New', monospace;
+    }
+
+    .quiz-option:hover {
+      background-color: var(--accent1);
+      color: white;
+      transform: translateX(5px);
+    }
+
+    .quiz-option.correct {
+      background-color: #81b29a;
+      color: white;
+      animation: celebrate 1s ease;
+    }
+
+    .quiz-option.incorrect {
+      background-color: #e07a5f;
+      color: white;
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .quiz-result {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+      margin-top: 1rem;
+      padding: 0.8rem;
+      border-radius: 4px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .quiz-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
+
+    .quiz-btn {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      background-color: var(--accent1);
+      color: white;
+      border: 2px solid var(--secondary);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .quiz-btn:hover {
+      background-color: var(--primary);
+      transform: translateY(-2px);
+    }
+
+    .quiz-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: var(--secondary);
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: 600;
+      border-top: 4px solid var(--accent2);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+      margin-top: auto;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.4rem;
+        padding: 1rem;
+      }
+      
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+      
+      .chart-buttons {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .chart-buttons button {
+        width: 100%;
+        max-width: 250px;
+      }
+      
+      .quiz-options {
+        gap: 0.3rem;
+      }
+      
+      .quiz-option {
+        padding: 0.6rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Global Diabetes Trends
+    <a href="/" class="back-btn">🏠 Home</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Global Diabetes Insights</h1>
+      <p>Explore worldwide diabetes patterns through interactive visualizations and data analysis</p>
+    </section>
+
+    <div class="intro-blurb">
+      <h2>Understanding Global Diabetes Trends</h2>
+      <p>Diabetes affects millions worldwide, but its impact varies across regions and populations. These visualizations help us understand how diabetes prevalence, diagnosis rates, and healthcare spending differ around the globe, revealing important patterns in this growing health challenge.</p>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <!-- Sankey Diagram -->
+    <div class="chart-container">
+      <h3 style="font-family: 'Press Start 2P', cursive; text-align: center; margin-bottom: 1rem; color: var(--secondary);">Sankey Diagram: Diabetes Risk Factors</h3>
+      <div class="chart-box" id="sankey-diagram"></div>
+      <div class="chart-info">
+        <h3>What This Shows</h3>
+        <ul>
+          <li>Visualizes how diabetes distribution varies by <span class="define" data-definition="Whether someone is male or female.">sex</span> 
+          and <span class="define" data-definition="Groups that divide people by how old they are.">age groups</span></li>
+          <li>Reveals which demographic groups face higher diabetes risk</li>
+          <li>Line width indicates proportion of people in each category</li>
+        </ul>
+      </div>
+      <div class="info-button" data-source="Sankey Diagram (Risk Factors and Outcomes) - Source: CDC Diabetes Health Indicators Dataset (Kaggle, originally CDC BRFSS 2015).">i</div>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <div class="intro-blurb">
+      <h2>Global Diabetes Maps</h2>
+      <p>Explore how diabetes manifests differently across countries through these interactive maps. Each visualization tells a different part of the global diabetes story.</p>
+    </div>
+
+    <!-- Map buttons -->
+    <div class="chart-buttons">
+      <button class="chart-toggle" data-target="chart-prevalence">🌍 Prevalence Map</button>
+      <button class="chart-toggle" data-target="chart-undiagnosed">🔍 Undiagnosed Map</button>
+      <button class="chart-toggle" data-target="chart-spending">💵 Spending Map</button>
+    </div>
+
+    <!-- Map containers -->
+    <div class="chart-container" id="chart-prevalence-container">
+      <div class="chart-box" id="chart-prevalence"></div>
+      <div class="chart-info">
+        <h3>Diabetes <span class="define" data-definition="How common something is in a specific area or group.">Prevalence</span> % by Region</h3>
+        <ul>
+          <li>Shows percentage of population with diabetes in each country</li>
+          <li>Darker colors indicate higher diabetes rates</li>
+          <li>Helps identify geographic patterns in diabetes distribution</li>
+        </ul>
+      </div>
+      <div class="info-button" data-source="Diabetes Prevalence % by Region - Source: International Diabetes Federation (IDF) Diabetes Atlas, 10th Edition (2021).">i</div>
+    </div>
+
+    <div class="chart-container" id="chart-undiagnosed-container">
+      <div class="chart-box" id="chart-undiagnosed"></div>
+      <div class="chart-info">
+        <h3><span class="define" data-definition="When someone has a health condition but doesn't know about it.">Undiagnosed</span> Diabetes Rates</h3>
+        <ul>
+          <li>Shows percentage of people with diabetes who haven't been diagnosed</li>
+          <li>Darker colors indicate higher rates of undiagnosed cases</li>
+          <li>Reveals healthcare access and screening challenges</li>
+        </ul>
+      </div>
+      <div class="info-button" data-source="Undiagnosed Diabetes - Source: International Diabetes Federation (IDF) Diabetes Atlas, 10th Edition (2021).">i</div>
+    </div>
+
+    <div class="chart-container" id="chart-spending-container">
+      <div class="chart-box" id="chart-spending"></div>
+      <div class="chart-info">
+        <h3>Health <span class="define" data-definition="The amount of money spent on something.">Expenditure</span> per Person (USD)</h3>
+        <ul>
+          <li>Shows healthcare spending on diabetes per person</li>
+          <li>Darker colors indicate higher investment in diabetes care</li>
+          <li>Highlights economic disparities in diabetes management</li>
+        </ul>
+      </div>
+      <div class="info-button" data-source="Health Expenditure per Person (USD) - Source: International Diabetes Federation (IDF) Diabetes Atlas, 10th Edition (2021).">i</div>
+    </div>
+
+    <!-- Key Insights section moved here -->
+    <div class="intro-blurb">
+      <h2>Key Insights</h2>
+      <p>These visualizations reveal important global patterns: Western Pacific regions show high prevalence, many African nations have high undiagnosed rates, and spending varies dramatically between developed and developing countries. Understanding these patterns helps target interventions where they're needed most.</p>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <div class="interactive-quiz">
+      <h3>Test Your Diabetes Knowledge! 🧠</h3>
+      
+      <div class="quiz-stats">
+        <div>Question: <span id="currentQuestion">1</span>/15</div>
+        <div>Score: <span id="score">0</span>/15</div>
+      </div>
+      
+      <div class="quiz-question" id="quizQuestion"></div>
+      <div class="quiz-options" id="quizOptions"></div>
+      <div class="quiz-result" id="quizResult"></div>
+      
+      <div class="quiz-nav">
+        <button class="quiz-btn" id="prevQuestion" disabled>Previous</button>
+        <button class="quiz-btn" id="nextQuestion">Next Question</button>
+      </div>
+    </div>
+
+    <div class="pixel-divider"></div>
+  </main>
+
+  <footer>
+    Created by Eva Yu · STEM League Tech Innovators Internship · 2025
+  </footer>
+
+  <script>
+    // Quiz questions data
+    const quizQuestions = [
+      {
+        question: "Which country has the highest percentage of undiagnosed diabetes?",
+        options: ["United States", "South Africa", "Germany", "Australia"],
+        correct: 1
+      },
+      {
+        question: "Which country spends the most per person on diabetes care?",
+        options: ["United States", "China", "India", "Brazil"],
+        correct: 0
+      },
+      {
+        question: "What does a Sankey diagram visualize?",
+        options: ["Geographic distribution", "Flow between categories", "Time-based trends", "Statistical correlations"],
+        correct: 1
+      },
+      {
+        question: "Which age group is most at risk for diabetes based on the data?",
+        options: ["18-24", "25-34", "45-54", "65+"],
+        correct: 3
+      },
+      {
+        question: "What does 'prevalence' mean in the context of diabetes?",
+        options: ["How serious the condition is", "How common the condition is", "How much it costs to treat", "How many people die from it"],
+        correct: 1
+      },
+      {
+        question: "Which country has the lowest diabetes prevalence according to the data?",
+        options: ["South Africa", "China", "India", "United States"],
+        correct: 0
+      },
+      {
+        question: "What is the approximate diabetes prevalence in the United States?",
+        options: ["5.4%", "8.9%", "11.4%", "15.2%"],
+        correct: 2
+      },
+      {
+        question: "Which country has a similar diabetes prevalence to Brazil?",
+        options: ["India", "China", "Australia", "Germany"],
+        correct: 0
+      },
+      {
+        question: "What percentage of diabetes cases in China are undiagnosed?",
+        options: ["24%", "36%", "53%", "57%"],
+        correct: 3
+      },
+      {
+        question: "How does the US spending on diabetes compare to Germany?",
+        options: ["About the same", "Half as much", "Twice as much", "Five times as much"],
+        correct: 2
+      },
+      {
+        question: "Which two countries have the same undiagnosed diabetes rate?",
+        options: ["India and Brazil", "China and Australia", "US and Germany", "South Africa and China"],
+        correct: 0
+      },
+      {
+        question: "What might a high undiagnosed rate indicate about a country's healthcare system?",
+        options: ["Excellent screening programs", "Limited access to healthcare", "High quality of care", "Low diabetes prevalence"],
+        correct: 1
+      },
+      {
+        question: "Which country has the biggest gap between spending and prevalence?",
+        options: ["United States", "China", "South Africa", "Australia"],
+        correct: 1
+      },
+      {
+        question: "What does the width represent in a Sankey diagram?",
+        options: ["Importance", "Time", "Quantity or proportion", "Geographic size"],
+        correct: 2
+      },
+      {
+        question: "Which demographic factor appears to have the strongest correlation with diabetes risk?",
+        options: ["Sex", "Age", "Income level", "Education level"],
+        correct: 1
+      }
+    ];
+
+    let currentQuizQuestion = 0;
+    let score = 0;
+    let userAnswers = new Array(quizQuestions.length).fill(null);
+
+    // Initialize quiz
+    function loadQuestion() {
+      const question = quizQuestions[currentQuizQuestion];
+      document.getElementById('quizQuestion').textContent = question.question;
+      document.getElementById('currentQuestion').textContent = currentQuizQuestion + 1;
+      document.getElementById('score').textContent = score;
+      
+      const optionsContainer = document.getElementById('quizOptions');
+      optionsContainer.innerHTML = '';
+      
+      question.options.forEach((option, index) => {
+        const optionElement = document.createElement('div');
+        optionElement.className = 'quiz-option';
+        if (userAnswers[currentQuizQuestion] === index) {
+          optionElement.classList.add(userAnswers[currentQuizQuestion] === question.correct ? 'correct' : 'incorrect');
+        }
+        optionElement.textContent = option;
+        optionElement.addEventListener('click', () => selectAnswer(index));
+        optionsContainer.appendChild(optionElement);
+      });
+      
+      document.getElementById('quizResult').textContent = '';
+      document.getElementById('prevQuestion').disabled = currentQuizQuestion === 0;
+      document.getElementById('nextQuestion').textContent = currentQuizQuestion === quizQuestions.length - 1 ? 'Finish Quiz' : 'Next Question';
+    }
+
+    function selectAnswer(answerIndex) {
+      if (userAnswers[currentQuizQuestion] !== null) return; // Already answered
+      
+      userAnswers[currentQuizQuestion] = answerIndex;
+      const question = quizQuestions[currentQuizQuestion];
+      const options = document.querySelectorAll('.quiz-option');
+      
+      options.forEach((option, index) => {
+        if (index === question.correct) {
+          option.classList.add('correct');
+        } else if (index === answerIndex && index !== question.correct) {
+          option.classList.add('incorrect');
+        }
+        option.style.cursor = 'default';
+      });
+      
+      if (answerIndex === question.correct) {
+        score++;
+        document.getElementById('quizResult').textContent = '✅ Correct! Well done!';
+        document.getElementById('quizResult').style.backgroundColor = '#81b29a';
+      } else {
+        document.getElementById('quizResult').textContent = '❌ Incorrect. The correct answer is: ' + question.options[question.correct];
+        document.getElementById('quizResult').style.backgroundColor = '#e07a5f';
+      }
+      
+      document.getElementById('score').textContent = score;
+    }
+
+    // Navigation buttons
+    document.getElementById('nextQuestion').addEventListener('click', () => {
+      if (currentQuizQuestion < quizQuestions.length - 1) {
+        currentQuizQuestion++;
+        loadQuestion();
+      } else {
+        // Show final results
+        document.getElementById('quizQuestion').textContent = 'Quiz Complete!';
+        document.getElementById('quizOptions').innerHTML = `
+          <div style="text-align: center; font-family: 'Courier New', monospace;">
+            <h3>Your final score: ${score}/${quizQuestions.length}</h3>
+            <p>${score >= 12 ? '🎉 Excellent job! You really know your diabetes facts!' : 
+               score >= 8 ? '👍 Good effort! You know quite a bit about diabetes.' : 
+               '📚 Keep learning! Review the visualizations to improve your knowledge.'}</p>
+          </div>
+        `;
+        document.getElementById('quizResult').textContent = '';
+        document.getElementById('quizResult').style.backgroundColor = 'transparent';
+        document.getElementById('nextQuestion').style.display = 'none';
+        document.getElementById('prevQuestion').style.display = 'none';
+      }
+    });
+
+    document.getElementById('prevQuestion').addEventListener('click', () => {
+      if (currentQuizQuestion > 0) {
+        currentQuizQuestion--;
+        loadQuestion();
+      }
+    });
+
+    // Initialize the quiz
+    loadQuestion();
+
+    // Hide all maps at start
+    document.querySelectorAll('#chart-prevalence-container, #chart-undiagnosed-container, #chart-spending-container').forEach(container => {
+      container.style.display = 'none';
+    });
+
+    // Button toggle
+    const buttons = document.querySelectorAll('.chart-toggle');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target') + "-container";
+        const targetContainer = document.getElementById(targetId);
+        
+        // Hide all containers first
+        document.querySelectorAll('#chart-prevalence-container, #chart-undiagnosed-container, #chart-spending-container').forEach(container => {
+          container.style.display = 'none';
+        });
+        
+        // Remove active class from all buttons
+        buttons.forEach(button => {
+          button.classList.remove('active');
+        });
+        
+        // Show selected container and set button as active
+        targetContainer.style.display = 'block';
+        btn.classList.add('active');
+      });
+    });
+
+    // Sankey Diagram
+    var sankeyData = {
+      type: "sankey",
+      orientation: "h",
+      node: {
+        pad: 15, 
+        thickness: 20,
+        line: { color: "black", width: 0.5 },
+        label: ["Male", "Female", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"],
+        color: ["#81b29a", "#e07a5f", "#f2cc8f", "#f2cc8f", "#81b29a", "#81b29a", "#e07a5f", "#e07a5f"]
+      },
+      link: {
+        source: [0,0,0,1,1,1],
+        target: [2,3,4,5,6,7],
+        value: [10,20,30,15,25,35],
+        color: ["rgba(129, 178, 154, 0.6)", "rgba(129, 178, 154, 0.6)", "rgba(129, 178, 154, 0.6)", 
+                "rgba(224, 122, 95, 0.6)", "rgba(224, 122, 95, 0.6)", "rgba(224, 122, 95, 0.6)"],
+        hovertemplate: '%{value}%'
+      }
+    };
+    
+    var sankeyLayout = {
+      title: {
+        text: "Diabetes Distribution by Age and Gender",
+        font: { family: 'VT323', size: 16 }
+      },
+      font: { family: 'VT323' },
+      plot_bgcolor: '#f4f1de',
+      paper_bgcolor: '#f4f1de',
+      autosize: true,
+      margin: {l:0, r:0, t:30, b:0}
+    };
+    
+    Plotly.newPlot('sankey-diagram', [sankeyData], sankeyLayout, {displayModeBar:false, responsive:true});
+
+    // Maps with updated color scale to match theme
+    const colorScale = [[0,'#d0f0c0'],[0.5,'#f2cc8f'],[1,'#e07a5f']];
+    
+    function renderMap(containerId, dataset, colorBarTitle) {
+      const dataMap = [{
+        type: 'choropleth',
+        locations: dataset.map(d => d.country),
+        z: dataset.map(d => d.value),
+        locationmode: 'country names',
+        colorscale: colorScale,
+        text: dataset.map(d => `${d.country}: ${d.value}${colorBarTitle === 'USD' ? '$' : '%'}`),
+        hoverinfo: 'text',
+        colorbar: { 
+          title: { 
+            text: colorBarTitle, 
+            font: { family:'VT323', size:14 } 
+          }, 
+          tickfont: { family:'VT323', size:12 } 
+        },
+        showscale: true
+      }];
+      
+      const layoutMap = {
+        geo: { 
+          projection: { type: 'mercator' }, 
+          showcoastlines: true, 
+          coastlinecolor: '#3d405b', 
+          showland: true, 
+          landcolor: '#f5f5dc', 
+          showocean: true, 
+          oceancolor: '#d0f0c0', 
+          fixedrange: true,
+          bgcolor: '#f4f1de'
+        },
+        margin: { t:30, r:0, l:0, b:0 },
+        autosize: true,
+        dragmode: false,
+        paper_bgcolor: '#f4f1de',
+        plot_bgcolor: '#f4f1de',
+        font: { family: 'VT323' }
+      };
+      
+      Plotly.newPlot(containerId, dataMap, layoutMap, {displayModeBar:false, responsive:true});
+    }
+    
+    const prevalenceData = [
+      {country:"United States", value:11.4},
+      {country:"China", value:11.3},
+      {country:"India", value:9.5},
+      {country:"Brazil", value:9.5},
+      {country:"Germany", value:8.9},
+      {country:"South Africa", value:4.3},
+      {country:"Australia", value:9.3}
+    ];
+    
+    const undiagnosedData = [
+      {country:"United States", value:24},
+      {country:"China", value:57},
+      {country:"India", value:36},
+      {country:"Brazil", value:36},
+      {country:"Germany", value:35},
+      {country:"South Africa", value:60},
+      {country:"Australia", value:53}
+    ];
+    
+    const spendingData = [
+      {country:"United States", value:348},
+      {country:"China", value:8},
+      {country:"India", value:21},
+      {country:"Brazil", value:21},
+      {country:"Germany", value:146},
+      {country:"South Africa", value:12},
+      {country:"Australia", value:140}
+    ];
+    
+    renderMap('chart-prevalence', prevalenceData, 'Prevalence %');
+    renderMap('chart-undiagnosed', undiagnosedData, 'Undiagnosed %');
+    renderMap('chart-spending', spendingData, 'USD');
+
+    // Improved Definitions popup functionality
+    let activePopup = null;
+    
+    const defines = document.querySelectorAll('.define');
+    defines.forEach(word => {
+      // Create popup element for each definition
+      const popup = document.createElement('div');
+      popup.className = "definition-popup";
+      popup.innerText = word.dataset.definition;
+      word.appendChild(popup);
+      
+      word.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Close any active popup
+        if (activePopup && activePopup !== popup) {
+          activePopup.classList.remove('active');
+        }
+        
+        // Toggle current popup
+        popup.classList.toggle('active');
+        activePopup = popup.classList.contains('active') ? popup : null;
+      });
+    });
+    
+    // Info button functionality
+    const infoButtons = document.querySelectorAll('.info-button');
+    infoButtons.forEach(button => {
+      // Create popup element for each info button
+      const popup = document.createElement('div');
+      popup.className = "definition-popup";
+      popup.innerText = button.getAttribute('data-source');
+      button.appendChild(popup);
+      
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        // Close any active popup
+        if (activePopup && activePopup !== popup) {
+          activePopup.classList.remove('active');
+        }
+        
+        // Toggle current popup
+        popup.classList.toggle('active');
+        activePopup = popup.classList.contains('active') ? popup : null;
+        updateProgress();
+      });
+    });
+    
+    // Close popup when clicking anywhere else
+    document.addEventListener('click', (e) => {
+      if (activePopup && !activePopup.parentElement.contains(e.target)) {
+        activePopup.classList.remove('active');
+        activePopup = null;
+      }
+    });
+
+    // Initialize with first map visible
+    document.querySelector('.chart-toggle').click();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1149 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Day-in-the-Life: Diabetes Choices</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e07a5f;
+      --secondary: #3d405b;
+      --accent1: #81b29a;
+      --accent2: #f2cc8f;
+      --accent3: #f4f1de;
+      --bg: #f5f5dc;
+      --text: #3d405b;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'VT323', monospace;
+      line-height: 1.5;
+      overflow-x: hidden;
+    }
+    
+    /* Pixel art elements */
+    .pixel-art {
+      image-rendering: pixelated;
+    }
+    
+    header {
+      background: var(--primary);
+      color: #fff;
+      text-align: center;
+      padding: 1.2rem 0;
+      border-bottom: 4px solid var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+      position: relative;
+      box-shadow: 0 4px 0 #0003;
+    }
+    
+    .wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 1rem;
+      padding-bottom: 4rem;
+    }
+    
+    /* Welcome screen */
+    .welcome-screen {
+      text-align: center;
+      padding: 2rem 1rem;
+    }
+    
+    .title-card {
+      background: #fff;
+      border: 3px solid var(--secondary);
+      border-radius: 16px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0 #aaa;
+      margin-bottom: 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .title-card::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: -10px;
+      right: -10px;
+      height: 10px;
+      background: var(--accent2);
+      transform: skewY(-2deg);
+      z-index: -1;
+    }
+    
+    .title-card h2 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .title-card p {
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+    
+    .character-selection {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+    
+    .character {
+      width: 80px;
+      height: 80px;
+      border: 3px solid var(--secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: var(--accent3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 2rem;
+    }
+    
+    .character:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px var(--accent1);
+    }
+    
+    .character.selected {
+      transform: scale(1.1);
+      box-shadow: 0 0 0 3px var(--primary);
+      background: var(--accent2);
+    }
+    
+    .start-btn {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      background: var(--accent1);
+      color: white;
+      border: 3px solid var(--secondary);
+      border-radius: 8px;
+      padding: 1rem 2rem;
+      cursor: pointer;
+      box-shadow: 4px 4px 0 #888;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+    
+    .start-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 #666;
+      background: var(--primary);
+    }
+    
+    /* HUD with improved visuals */
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.8rem;
+      margin: 1.5rem 0;
+      position: relative;
+    }
+    
+    .stat {
+      background: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 12px;
+      padding: 0.8rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 3px 3px 0 #ccc;
+    }
+    
+    .stat-label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    .bar-container {
+      height: 16px;
+      background: #fff;
+      border: 2px solid var(--secondary);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.5s ease;
+    }
+    
+    .glucose-fill { background: linear-gradient(90deg, #81b29a, #3d405b); }
+    .energy-fill { background: linear-gradient(90deg, #f2cc8f, #e07a5f); }
+    .stress-fill { background: linear-gradient(90deg, #f4f1de, #3d405b); }
+    
+    .stat-value {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: var(--secondary);
+      text-shadow: 1px 1px 0 #fff;
+      z-index: 2;
+    }
+    
+    /* Character avatar */
+    .character-avatar {
+      width: 100px;
+      height: 100px;
+      margin: 0 auto 1rem;
+      border: 3px solid var(--secondary);
+      border-radius: 50%;
+      background: var(--accent3);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 3rem;
+      transition: all 0.3s;
+      box-shadow: 4px 4px 0 #ccc;
+    }
+    
+    /* Toolbar */
+    .toolbar {
+      display: flex;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+      justify-content: center;
+    }
+    
+    .tool {
+      background: #fff;
+      border: 2px dashed var(--secondary);
+      border-radius: 10px;
+      padding: 0.6rem 1rem;
+      cursor: pointer;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .tool:hover {
+      background: var(--accent3);
+      transform: translateY(-2px);
+      box-shadow: 0 2px 0 #ccc;
+    }
+    
+    /* Scene card */
+    .scene-card {
+      background: #fff;
+      border: 3px solid var(--secondary);
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 6px 6px 0 #aaa;
+      position: relative;
+      margin-bottom: 2rem;
+    }
+    
+    .scene-card::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 94%;
+      height: 10px;
+      background: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      z-index: -1;
+    }
+    
+    .scene-title {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      text-align: center;
+      border-bottom: 2px dashed var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+    
+    .scene-text {
+      font-size: 1.3rem;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+    
+    /* Choices */
+    .choices {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 0.8rem;
+    }
+    
+    .choice-btn {
+      background: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 10px;
+      padding: 1rem;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #bbb;
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      transition: all 0.2s;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    
+    .choice-btn:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 #888;
+      background: var(--accent1);
+      color: #fff;
+    }
+    
+    .choice-btn::before {
+      content: '→';
+      font-weight: bold;
+    }
+    
+    /* Feedback note */
+    .feedback-note {
+      background: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      animation: fadeIn 0.5s;
+      display: none;
+    }
+    
+    .feedback-note.good {
+      border-color: var(--accent1);
+      background: rgba(129, 178, 154, 0.2);
+    }
+    
+    .feedback-note.bad {
+      border-color: var(--primary);
+      background: rgba(224, 122, 95, 0.2);
+    }
+    
+    /* Modals */
+    dialog {
+      border: 3px solid var(--secondary);
+      border-radius: 14px;
+      max-width: 720px;
+      background: var(--accent3);
+      box-shadow: 8px 8px 0 #0004;
+    }
+    
+    dialog::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    
+    .modal-content {
+      padding: 1.5rem;
+    }
+    
+    .modal-title {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    
+    /* Progress animation */
+    @keyframes progress {
+      0% { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    
+    /* Audio controls */
+    .audio-controls {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      z-index: 100;
+    }
+    
+    .audio-btn {
+      background: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 #ccc;
+    }
+    
+    /* Celebration animation */
+    .celebration {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+   .back-btn {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      background-color: #d0f0c0;
+      border: 2px solid #556b2f;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+    .back-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: #c0e0a0;
+      color: #fff;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      opacity: 0;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hud {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      
+      .choices {
+        grid-template-columns: 1fr;
+      }
+      
+      .character-selection {
+        flex-wrap: wrap;
+      }
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 3rem;
+      color: #666;
+      font-size: 0.95rem;
+      padding: 1rem;
+      border-top: 2px dashed var(--secondary);
+    }
+    
+    .kbd {
+      font-family: monospace;
+      background: #eee;
+      border: 1px solid #bbb;
+      border-bottom-width: 3px;
+      border-radius: 6px;
+      padding: 0.05rem 0.35rem;
+    }
+  </style>
+</head>
+<body>
+  <header>Day-in-the-Life: Diabetes Choices
+    <a href="/" class="back-btn">🏠 Home</a>
+  </header>
+  
+  <div class="wrap">
+    <!-- Welcome Screen -->
+    <div id="welcomeScreen" class="welcome-screen">
+      <div class="title-card">
+        <h2>Welcome to Your Diabetes Journey!</h2>
+        <p>Experience a day managing diabetes through interactive choices. Make decisions about food, activity, and medication while tracking your glucose, energy, and stress levels.</p>
+        <p>Complete all 15 steps to see how well you managed your day!</p>
+      </div>
+      
+      <h3>Choose Your Character:</h3>
+      <div class="character-selection">
+        <div class="character" data-char="👨" onclick="selectCharacter(this)">👨</div>
+        <div class="character" data-char="👩" onclick="selectCharacter(this)">👩</div>
+        <div class="character" data-char="👦" onclick="selectCharacter(this)">👦</div>
+        <div class="character" data-char="👧" onclick="selectCharacter(this)">👧</div>
+      </div>
+      
+      <button class="start-btn" onclick="startGame()">START GAME</button>
+    </div>
+    
+    <!-- Game Screen (initially hidden) -->
+    <div id="gameScreen" style="display: none;">
+      <div class="hud">
+        <div class="stat">
+          <div class="stat-label">Glucose Trend</div>
+          <div class="bar-container">
+            <div id="gBar" class="bar-fill glucose-fill" style="width: 50%"></div>
+            <div class="stat-value" id="gValue">50%</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Energy</div>
+          <div class="bar-container">
+            <div id="eBar" class="bar-fill energy-fill" style="width: 60%"></div>
+            <div class="stat-value" id="eValue">60%</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Stress</div>
+          <div class="bar-container">
+            <div id="sBar" class="bar-fill stress-fill" style="width: 40%"></div>
+            <div class="stat-value" id="sValue">40%</div>
+          </div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Progress</div>
+          <div class="bar-container">
+            <div id="pBar" class="bar-fill" style="width: 0%; background: var(--accent1)"></div>
+            <div class="stat-value" id="pValue">0/15</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="character-avatar" id="avatar">👨</div>
+      
+      <div class="toolbar">
+        <button class="tool" id="undoBtn">⏪ Undo</button>
+        <button class="tool" id="timelineBtn">🗂️ Timeline</button>
+
+        <button class="tool" id="restartBtn">🔄 Restart</button>
+      </div>
+      
+      <div class="scene-card">
+        <h3 class="scene-title" id="sceneTitle">Let's begin your day...</h3>
+        <div class="scene-text" id="sceneText"></div>
+        <div class="choices" id="choices"></div>
+        <div class="feedback-note" id="feedback"></div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Timeline Modal -->
+  <dialog id="timelineModal">
+    <div class="modal-content">
+      <h3 class="modal-title">Your Journey's Timeline</h3>
+      <ol id="timelineList" style="max-height: 45vh; overflow: auto; padding-left: 1.5rem;"></ol>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+        <button class="tool" onclick="document.getElementById('timelineModal').close()">Close</button>
+      </div>
+    </div>
+  </dialog>
+  
+  <!-- Review Modal -->
+  <dialog id="reviewModal">
+    <div class="modal-content">
+      <h3 class="modal-title">How things went</h3>
+      <div id="reviewBody" class="scene-text"></div>
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1.5rem;">
+        <button class="tool" onclick="document.getElementById('reviewModal').close()">Close</button>
+      </div>
+    </div>
+  </dialog>
+  
+  <!-- Audio Controls -->
+  <div class="audio-controls">
+    <button class="audio-btn" id="soundToggle">🔊</button>
+  </div>
+  
+  <footer>
+    Educational, not medical advice. If you have diabetes or are at risk, follow your clinician's guidance.
+  </footer>
+  
+  <!-- Audio elements -->
+  <audio id="clickSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+  <audio id="goodSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+  <audio id="badSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+  <audio id="winSound" src="data:audio/mpeg;base64,SUQzBAAAAAABEVRYWFgAAAAtAAADY29tbWVudABCaWdTb3VuZEJhbmsuY29tIC8gTGFTb25vdGhlcXVlLm9yZwBURU5DAAAAHQAAA1N3aXRjaCBQbHVzIMKpIE5DSCBTb2Z0d2FyZQBUSVQyAAAABgAAAzIyMzUAVFNTRQAAAA8AAANMYXZmNTcuODMuMTAwAAAAAAAAAAAAAAD/80DEAAAAA0gAAAAATEFNRTMuMTAwVVVVVVVVVVVVVUxBTUUzLjEwMFVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQsRbAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVf/zQMSkAAADSAAAAABVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" preload="auto"></audio>
+
+ <script>
+  // --- Game State ---
+  const MAX_STEPS = 15;
+  const state = {
+    step: 0,
+    glucose: 50,
+    energy: 60,
+    stress: 40,
+    history: [],
+    events: [],
+    mistakes: [],
+    character: '👨',
+    soundEnabled: true
+  };
+
+  // DOM Elements
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const gameScreen = document.getElementById('gameScreen');
+  const avatar = document.getElementById('avatar');
+  const undoBtn = document.getElementById('undoBtn');
+  const timelineBtn = document.getElementById('timelineBtn');
+  const reviewBtn = document.getElementById('reviewBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const timelineModal = document.getElementById('timelineModal');
+  const reviewModal = document.getElementById('reviewModal');
+  const timelineList = document.getElementById('timelineList');
+  const reviewBody = document.getElementById('reviewBody');
+  
+  // Audio Elements
+  const clickSound = document.getElementById('clickSound');
+  const goodSound = document.getElementById('goodSound');
+  const badSound = document.getElementById('badSound');
+  const winSound = document.getElementById('winSound');
+  const soundToggle = document.getElementById('soundToggle');
+  
+  // Sound control
+  soundToggle.addEventListener('click', () => {
+    state.soundEnabled = !state.soundEnabled;
+    soundToggle.textContent = state.soundEnabled ? '🔊' : '🔇';
+  });
+  
+  function playSound(sound) {
+    if (state.soundEnabled) {
+      sound.currentTime = 0;
+      sound.play().catch(e => console.log("Audio play failed:", e));
+    }
+  }
+  
+  // Character selection
+  function selectCharacter(el) {
+    document.querySelectorAll('.character').forEach(char => char.classList.remove('selected'));
+    el.classList.add('selected');
+    state.character = el.getAttribute('data-char');
+    avatar.textContent = state.character;
+  }
+  
+  function startGame() {
+    if (!state.character) {
+      alert('Please select a character first!');
+      return;
+    }
+    
+    welcomeScreen.style.display = 'none';
+    gameScreen.style.display = 'block';
+    playSound(clickSound);
+    restart();
+  }
+  
+  // Utility functions
+  function clamp(n) { return Math.max(0, Math.min(100, n)); }
+  
+  function updateHUD() {
+    document.getElementById('gBar').style.width = state.glucose + '%';
+    document.getElementById('eBar').style.width = state.energy + '%';
+    document.getElementById('sBar').style.width = state.stress + '%';
+    document.getElementById('pBar').style.width = (state.step / MAX_STEPS * 100) + '%';
+    
+    document.getElementById('gValue').textContent = state.glucose + '%';
+    document.getElementById('eValue').textContent = state.energy + '%';
+    document.getElementById('sValue').textContent = state.stress + '%';
+    document.getElementById('pValue').textContent = state.step + '/15';
+    
+    // Update avatar expression based on stats
+    updateAvatar();
+  }
+  
+  function updateAvatar() {
+    let expression = state.character;
+    
+    if (state.glucose > 70) expression = '😵';
+    else if (state.glucose < 30) expression = '🥴';
+    else if (state.energy > 70) expression = '💪';
+    else if (state.energy < 30) expression = '😴';
+    else if (state.stress > 70) expression = '😫';
+    else if (state.stress < 30) expression = '😌';
+    
+    avatar.textContent = expression;
+    
+    // Add animation if stats are critical
+    if (state.glucose > 80 || state.glucose < 20 || 
+        state.energy < 20 || state.stress > 80) {
+      avatar.style.animation = 'pulse 0.5s infinite';
+    } else {
+      avatar.style.animation = '';
+    }
+  }
+  
+  function snapshot() {
+    state.history.push(JSON.parse(JSON.stringify({
+      step: state.step,
+      glucose: state.glucose,
+      energy: state.energy,
+      stress: state.stress,
+      events: [...state.events],
+      mistakes: [...state.mistakes]
+    })));
+  }
+  
+  function undo() {
+    if (state.history.length > 1) {
+      state.history.pop(); // Remove current state
+      restore(state.history.length - 1);
+      playSound(clickSound);
+    }
+  }
+  
+  function restore(index) {
+    const snap = state.history[index];
+    state.step = snap.step;
+    state.glucose = snap.glucose;
+    state.energy = snap.energy;
+    state.stress = snap.stress;
+    state.events = [...snap.events];
+    state.mistakes = [...snap.mistakes];
+    state.history = state.history.slice(0, index + 1);
+    renderScene();
+  }
+  
+  // --- Scenes (15 choices) ---
+  const SCENES = [
+    {
+      id: 1, 
+      title: "Morning check", 
+      text: "You wake up feeling a bit groggy. The sun is just starting to peek through your window. Do you check your fasting blood glucose (or take note of how you feel)?",
+      choices: [
+        { text: "Yes, quick check/awareness", effects: { g: -3, e: 0, s: -2 }, good: true, 
+          explanation: "Knowing your starting point helps guide food/med choices for the day." },
+        { text: "Skip it, I'm in a rush", effects: { g: 2, e: 0, s: 2 }, good: false, 
+          explanation: "Skipping feedback can make later choices less informed and lead to unexpected spikes." }
+      ]
+    },
+    {
+      id: 2, 
+      title: "Breakfast time", 
+      text: "You're hungry and ready for breakfast. What do you choose?",
+      choices: [
+        { text: "Balanced meal with protein & complex carbs", effects: { g: -5, e: 8, s: -2 }, good: true, 
+          explanation: "Protein and complex carbs provide sustained energy without spiking glucose." },
+        { text: "Sweet cereal or pastry", effects: { g: 15, e: 5, s: 3 }, good: false, 
+          explanation: "Simple carbs cause rapid glucose spikes followed by energy crashes." }
+      ]
+    },
+    {
+      id: 3, 
+      title: "Medication decision", 
+      text: "Time to consider your medication. What's your approach?",
+      choices: [
+        { text: "Take prescribed medication mindfully", effects: { g: -10, e: 0, s: -1 }, good: true, 
+          explanation: "Consistent medication helps maintain stable glucose levels throughout the day." },
+        { text: "Skip or adjust dose without guidance", effects: { g: 12, e: -3, s: 5 }, good: false, 
+          explanation: "Changing medication without professional advice can lead to dangerous fluctuations." }
+      ]
+    },
+    {
+      id: 4, 
+      title: "Mid-morning energy dip", 
+      text: "It's mid-morning and you're feeling an energy slump. How do you respond?",
+      choices: [
+        { text: "Short walk and water", effects: { g: -3, e: 5, s: -3 }, good: true, 
+          explanation: "Movement helps insulin sensitivity and hydration supports overall function." },
+        { text: "Sugary snack for quick energy", effects: { g: 12, e: 3, s: 2 }, good: false, 
+          explanation: "Sugar provides temporary energy but causes a spike and subsequent crash." }
+      ]
+    },
+    {
+      id: 5, 
+      title: "Lunch options", 
+      text: "Lunchtime! You're at a café with colleagues. What do you order?",
+      choices: [
+        { text: "Grilled protein with veggies and whole grains", effects: { g: -4, e: 7, s: -2 }, good: true, 
+          explanation: "A balanced meal supports steady glucose and sustained energy." },
+        { text: "Burger, fries, and soda", effects: { g: 18, e: 2, s: 4 }, good: false, 
+          explanation: "High-fat, high-carb meals can cause delayed glucose spikes and sluggishness." }
+      ]
+    },
+    {
+      id: 6, 
+      title: "Afternoon stress", 
+      text: "Your boss gives you an unexpected tight deadline. You feel stressed. How do you handle it?",
+      choices: [
+        { text: "Take deep breaths, prioritize tasks", effects: { g: -2, e: -2, s: -8 }, good: true, 
+          explanation: "Stress management prevents cortisol spikes that can raise glucose levels." },
+        { text: "Skip lunch, work through, drink coffee", effects: { g: 8, e: -5, s: 10 }, good: false, 
+          explanation: "Skipping meals and caffeine under stress can destabilize glucose control." }
+      ]
+    },
+    {
+      id: 7, 
+      title: "Afternoon snack", 
+      text: "It's 3 PM and you're feeling hungry again. What's your snack choice?",
+      choices: [
+        { text: "Handful of nuts or cheese stick", effects: { g: -2, e: 4, s: -1 }, good: true, 
+          explanation: "Protein-rich snacks provide sustained energy without spiking glucose." },
+        { text: "Candy bar or cookies", effects: { g: 12, e: 2, s: 2 }, good: false, 
+          explanation: "Sugar-laden snacks cause rapid glucose spikes and subsequent crashes." }
+      ]
+    },
+    {
+      id: 8, 
+      title: "Evening exercise", 
+      text: "You have some free time after work. How do you spend it?",
+      choices: [
+        { text: "Go for a walk or do light exercise", effects: { g: -8, e: 5, s: -5 }, good: true, 
+          explanation: "Regular activity improves insulin sensitivity and helps manage glucose." },
+        { text: "Crash on the couch watching TV", effects: { g: 3, e: -3, s: 2 }, good: false, 
+          explanation: "Sedentary behavior can lead to higher glucose levels and reduced energy." }
+      ]
+    },
+    {
+      id: 9, 
+      title: "Dinner decisions", 
+      text: "Planning dinner after a long day. What do you prepare?",
+      choices: [
+        { text: "Balanced meal with lean protein and vegetables", effects: { g: -5, e: 6, s: -3 }, good: true, 
+          explanation: "Evening meals should be balanced to maintain stable glucose overnight." },
+        { text: "Takeout pizza or pasta", effects: { g: 15, e: 2, s: 4 }, good: false, 
+          explanation: "Large, carb-heavy evening meals can lead to elevated morning glucose." }
+      ]
+    },
+    {
+      id: 10, 
+      title: "Evening glucose check", 
+      text: "It's been a few hours since dinner. Do you check your glucose levels?",
+      choices: [
+        { text: "Yes, check and note patterns", effects: { g: -2, e: 0, s: -2 }, good: true, 
+          explanation: "Evening checks help understand how food and activity affect overnight levels." },
+        { text: "No, I'm tired and will skip it", effects: { g: 3, e: 0, s: 2 }, good: false, 
+          explanation: "Skipping checks misses important data about your daily glucose patterns." }
+      ]
+    },
+    {
+      id: 11, 
+      title: "Social gathering", 
+      text: "Friends invite you out for drinks. How do you handle this?",
+      choices: [
+        { text: "Sparkling water with lime, enjoy company", effects: { g: -2, e: 3, s: -4 }, good: true, 
+          explanation: "Social connection is important, and avoiding alcohol prevents glucose fluctuations." },
+        { text: "Several alcoholic drinks without food", effects: { g: -8, e: -5, s: 6 }, good: false, 
+          explanation: "Alcohol can cause dangerous glucose drops, especially without food." }
+      ]
+    },
+    {
+      id: 12, 
+      title: "Late-night cravings", 
+      text: "It's getting late but you're craving something sweet. What do you do?",
+      choices: [
+        { text: "Brush teeth, have herbal tea or water", effects: { g: -2, e: 0, s: -3 }, good: true, 
+          explanation: "Avoiding late-night snacks prevents glucose spikes before sleep." },
+        { text: "Ice cream or sugary snack", effects: { g: 12, e: 2, s: 3 }, good: false, 
+          explanation: "Late-night sugars can disrupt sleep and cause elevated morning glucose." }
+      ]
+    },
+    {
+      id: 13, 
+      title: "Bedtime preparation", 
+      text: "Getting ready for bed. How do you prepare for the night?",
+      choices: [
+        { text: "Set consistent sleep schedule, prepare meds for tomorrow", effects: { g: -2, e: 4, s: -4 }, good: true, 
+          explanation: "Routine supports stable glucose; preparation reduces morning stress." },
+        { text: "Stay up late scrolling phone", effects: { g: 3, e: -5, s: 3 }, good: false, 
+          explanation: "Poor sleep and blue light disrupt hormones that regulate glucose." }
+      ]
+    },
+    {
+      id: 14, 
+      title: "Unexpected low", 
+      text: "You wake up feeling shaky and sweaty in the middle of the night. What do you do?",
+      choices: [
+        { text: "Check glucose, have quick sugar if low, then protein", effects: { g: 10, e: -3, s: -2 }, good: true, 
+          explanation: "Treating lows properly prevents dangerous situations and rebound highs." },
+        { text: "Ignore it and try to go back to sleep", effects: { g: -5, e: -8, s: 8 }, good: false, 
+          explanation: "Ignoring hypoglycemia can be dangerous and lead to severe complications." }
+      ]
+    },
+    {
+      id: 15, 
+      title: "Wind-down & sleep", 
+      text: "It's been a long day. You're getting ready for bed. What's your bedtime routine?",
+      choices: [
+        { text: "Screen-free wind-down; sleep 7-9 hrs", effects: { g: -3, e: 6, s: -3 }, good: true, 
+          explanation: "Quality sleep supports hormones & glucose control. You'll wake up refreshed!" },
+        { text: "Late screens; short sleep", effects: { g: 4, e: -5, s: 3 }, good: false, 
+          explanation: "Poor sleep increases insulin resistance and makes tomorrow more challenging." }
+      ]
+    }
+  ];
+  
+  function applyEffects(effects) {
+    state.glucose = clamp(state.glucose + (effects.g || 0));
+    state.energy = clamp(state.energy + (effects.e || 0));
+    state.stress = clamp(state.stress + (effects.s || 0));
+  }
+  
+  function pickChoice(scene, choiceIdx) {
+    const choice = scene.choices[choiceIdx];
+    snapshot();
+    
+    // Record event
+    state.events.push({
+      step: state.step + 1,
+      title: scene.title,
+      choice: choice.text,
+      good: !!choice.good
+    });
+    
+    // Track mistakes
+    if (!choice.good) {
+      state.mistakes.push({
+        step: state.step + 1,
+        title: scene.title,
+        choice: choice.text,
+        explanation: choice.explanation
+      });
+    }
+    
+    applyEffects(choice.effects || {});
+    state.step = Math.min(MAX_STEPS, state.step + 1);
+    
+    // Play appropriate sound
+    if (choice.good) {
+      playSound(goodSound);
+    } else {
+      playSound(badSound);
+    }
+    
+    renderScene(choice);
+    
+    // Check for milestone notifications
+    checkMilestones();
+  }
+  
+  function checkMilestones() {
+    // Example: Notify when glucose is too high or low
+    if (state.glucose > 80) {
+      showNotification("Warning: Your glucose is getting high! Consider making healthier choices.");
+    } else if (state.glucose < 20) {
+      showNotification("Alert: Your glucose is very low! You might need to adjust your management.");
+    }
+    
+    // Energy and stress notifications
+    if (state.energy < 20) {
+      showNotification("You're running on empty! Try to boost your energy with better choices.");
+    }
+    
+    if (state.stress > 80) {
+      showNotification("Your stress is through the roof! Look for ways to relax and decompress.");
+    }
+  }
+  
+  function showNotification(message) {
+    // Create a temporary notification
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.position = 'fixed';
+    notification.style.top = '20px';
+    notification.style.left = '50%';
+    notification.style.transform = 'translateX(-50%)';
+    notification.style.backgroundColor = 'var(--accent2)';
+    notification.style.border = '2px solid var(--secondary)';
+    notification.style.padding = '1rem';
+    notification.style.borderRadius = '8px';
+    notification.style.zIndex = '1000';
+    notification.style.boxShadow = '0 4px 8px rgba(0,0,0,0.2)';
+    notification.style.animation = 'fadeIn 0.5s, fadeIn 0.5s 2.5s reverse forwards';
+    
+    document.body.appendChild(notification);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+      if (notification.parentNode) {
+        notification.parentNode.removeChild(notification);
+      }
+    }, 3000);
+  }
+  
+  function renderScene(lastChoice) {
+    updateHUD();
+    const sceneTitle = document.getElementById('sceneTitle');
+    const sceneText = document.getElementById('sceneText');
+    const choicesDiv = document.getElementById('choices');
+    const feedback = document.getElementById('feedback');
+    
+    if (lastChoice) {
+      feedback.style.display = 'block';
+      feedback.className = `feedback-note ${lastChoice.good ? 'good' : 'bad'}`;
+      feedback.textContent = lastChoice.good ? 
+        `👍 ${lastChoice.explanation}` : 
+        `⚠️ ${lastChoice.explanation}`;
+    } else {
+      feedback.style.display = 'none';
+    }
+    
+    // Game completion check
+    if (state.step >= MAX_STEPS) {
+      sceneTitle.textContent = 'Day Complete!';
+      
+      const summary = summarizeDay();
+      sceneText.innerHTML = summary.html;
+      
+      choicesDiv.innerHTML = `
+        <button class="choice-btn" onclick="openReview()">🧠 Review Breakdown</button>
+        <button class="choice-btn" onclick="restart()">🔄 Play Again</button>
+      `;
+      
+      playSound(winSound);
+      return;
+    }
+    
+    // Render current scene
+    const currentScene = SCENES[state.step];
+    sceneTitle.textContent = currentScene.title;
+    sceneText.textContent = currentScene.text;
+    
+    // Render choices
+    choicesDiv.innerHTML = '';
+    currentScene.choices.forEach((choice, idx) => {
+      const button = document.createElement('button');
+      button.className = 'choice-btn';
+      button.textContent = choice.text;
+      button.onclick = () => pickChoice(currentScene, idx);
+      choicesDiv.appendChild(button);
+    });
+  }
+  
+  function summarizeDay() {
+    const goodChoices = state.events.filter(e => e.good).length;
+    const score = Math.round((goodChoices / MAX_STEPS) * 100);
+    
+    let message = '';
+    if (score >= 80) message = 'Excellent diabetes management!';
+    else if (score >= 60) message = 'Good job with room for improvement.';
+    else message = 'Your diabetes management needs attention.';
+    
+    return {
+      score,
+      html: `
+        <p>${message} You made ${goodChoices} healthy choices out of ${MAX_STEPS}. Click "Review Breakdown" to see what you learned.</p>
+      `
+    };
+  }
+  
+  function openTimeline() {
+    timelineList.innerHTML = '';
+    state.events.forEach(event => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '0.5rem';
+      li.innerHTML = `<strong>${event.title}:</strong> ${event.choice} ${event.good ? '✅' : '⚠️'}`;
+      timelineList.appendChild(li);
+    });
+    timelineModal.showModal();
+    playSound(clickSound);
+  }
+  
+ function openReview() {
+  // Clear previous content
+  reviewBody.innerHTML = '';
+  
+  if (state.mistakes.length > 0) {
+    // Create and add the areas to improve section
+    const improveSection = document.createElement('div');
+    improveSection.innerHTML = `<h3 class="modal-title">Areas to Improve</h3>`;
+    
+    const list = document.createElement('ul');
+    list.style.marginTop = '1rem';
+    list.style.paddingLeft = '1.5rem';
+    
+    state.mistakes.forEach(mistake => {
+      const li = document.createElement('li');
+      li.style.marginBottom = '1rem';
+      li.innerHTML = `
+        <strong>${mistake.title}:</strong> ${mistake.choice}<br>
+        <em>${mistake.explanation}</em>
+      `;
+      list.appendChild(li);
+    });
+    
+    improveSection.appendChild(list);
+    reviewBody.appendChild(improveSection);
+  } else {
+    // Show perfect score message
+    reviewBody.innerHTML = `
+      <div style="text-align: center; padding: 2rem;">
+        <div style="font-size: 3rem; margin-bottom: 1rem;">🎉</div>
+        <h3 class="modal-title">Perfect Choices!</h3>
+        <p>You made all the right decisions throughout the day! Excellent diabetes management!</p>
+      </div>
+    `;
+  }
+  
+  // Show the modal
+  reviewModal.showModal();
+  playSound(clickSound);
+}
+  
+  function restart() {
+    state.step = 0;
+    state.glucose = 50;
+    state.energy = 60;
+    state.stress = 40;
+    state.history = [];
+    state.events = [];
+    state.mistakes = [];
+    snapshot();
+    renderScene();
+    playSound(clickSound);
+  }
+  
+  // Set up event listeners
+  undoBtn.addEventListener('click', undo);
+  timelineBtn.addEventListener('click', openTimeline);
+  reviewBtn.addEventListener('click', openReview);
+  restartBtn.addEventListener('click', restart);
+  
+  // Initialize game
+  snapshot();
+</script>
+</body>
+</html>
+
+        

@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Diabetes Risk Predictor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #e07a5f;
+      --secondary: #3d405b;
+      --accent1: #81b29a;
+      --accent2: #f2cc8f;
+      --accent3: #f4f1de;
+      --background: #f5f5dc;
+      --text: #3d405b;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'VT323', monospace;
+      background-color: var(--background);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: var(--primary);
+      padding: 1.5rem;
+      text-align: center;
+      color: #fff;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.8rem;
+      border-bottom: 4px solid var(--secondary);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    header::before, header::after {
+  content: '';
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: #d0f0c0; /* Use the muted green from your back button */
+  border: 2px solid #556b2f; /* Use the border color from your back button */
+  animation: spin 4s infinite linear;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+header::before {
+  top: 10px;
+  left: 10px;
+}
+
+header::after {
+  top: 10px;
+  right: 10px;
+}
+
+    .back-btn {
+      position: absolute;
+      top: 1rem;
+      right: 2rem;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      background-color: #d0f0c0;
+      border: 2px solid #556b2f;
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+    .back-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: #c0e0a0;
+      color: #fff;
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    main {
+      padding: 2rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      flex: 1;
+    }
+.hero {
+  background-color: #f2cc8f;
+  border: 3px solid #3d405b;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 6px 6px 0 #aaa;
+  text-align: center;
+
+  /* 👇 add these */
+  animation: bob 3s ease-in-out infinite;
+  margin-bottom: 2rem;
+}
+
+@keyframes bob {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+
+    .hero h1 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--text);
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .intro-blurb {
+      background-color: var(--accent1);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      border: 2px solid var(--secondary);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      position: relative;
+      color: white;
+    }
+
+    .intro-blurb::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 10px;
+      background: radial-gradient(ellipse at center, rgba(242, 204, 143, 0.5) 0%, transparent 70%);
+    }
+
+    .intro-blurb h2 {
+      margin-top: 0;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      border-bottom: 2px dashed white;
+      padding-bottom: 0.5rem;
+    }
+
+    .form-container {
+      background-color: var(--accent3);
+      border: 2px solid var(--secondary);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+      color: var(--secondary);
+      text-align: center;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      margin-top: 0;
+      border-bottom: 2px dashed var(--secondary);
+      padding-bottom: 0.5rem;
+    }
+
+    .form-group {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-weight: bold;
+      font-size: 0.95rem;
+      color: var(--secondary);
+      font-family: 'VT323', monospace;
+    }
+
+    .feature-label {
+      color: #556b2f;
+      text-decoration: underline dotted;
+      cursor: pointer;
+      font-size: 0.95rem;
+      margin-bottom: 0.2rem;
+      font-family: 'VT323', monospace;
+    }
+    .feature-label:hover {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    input[type="number"] {
+      font-family: 'VT323', monospace;
+      padding: 0.5rem;
+      font-size: 1rem;
+      border: 2px solid var(--secondary);
+      border-radius: 4px;
+      outline: none;
+      transition: border-color 0.2s;
+      background-color: var(--accent3);
+    }
+    input[type="number"]:focus {
+      border-color: var(--primary);
+    }
+
+    .predict-btn {
+      display: block;
+      margin: 1rem auto 2rem auto;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      background-color: var(--accent1);
+      color: white;
+      border: 2px solid var(--secondary);
+      border-radius: 4px;
+      padding: 0.7rem 1.5rem;
+      cursor: pointer;
+      text-decoration: none;
+      box-shadow: 2px 2px 0 #aaa;
+      transition: transform 0.1s, background-color 0.2s;
+    }
+    .predict-btn:hover {
+      transform: translate(-2px,-2px);
+      background-color: var(--primary);
+      box-shadow: 4px 4px 0 #888;
+    }
+
+    .report {
+      background-color: var(--accent3);
+      border: 3px solid var(--secondary);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 6px 6px 0 #aaa;
+      margin-bottom: 2rem;
+      display: none;
+    }
+
+    .result-section {
+      text-align: center;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: var(--accent2);
+      border: 2px solid var(--secondary);
+    }
+
+    .result-section h3 {
+      font-family: 'Press Start 2P', cursive;
+      color: var(--secondary);
+      margin-bottom: 1rem;
+    }
+
+    #predictedOutcome {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 2.5rem;
+      font-weight: bold;
+      display: block;
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      border-radius: 6px;
+      background-color: white;
+      border: 2px solid var(--secondary);
+    }
+
+    .positive-result {
+      color: #e07a5f;
+      animation: pulse 2s infinite;
+    }
+
+    .negative-result {
+      color: #81b29a;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    .recommendations {
+      background-color: var(--accent1);
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      color: white;
+      border-left: 4px solid var(--secondary);
+    }
+
+    .recommendations h3 {
+      margin-top: 0;
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      border-bottom: 2px dashed white;
+      padding-bottom: 0.5rem;
+    }
+
+    .recommendations ul {
+      padding-left: 1.5rem;
+    }
+
+    .recommendations li {
+      margin-bottom: 0.8rem;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    .feature-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+    }
+
+    .feature-table th, .feature-table td {
+      padding: 0.7rem 1rem;
+      border: 2px solid var(--secondary);
+      text-align: center;
+    }
+
+    .feature-table th {
+      background-color: var(--accent2);
+      color: var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+    }
+
+    .feature-table tr:nth-child(even) {
+      background-color: rgba(242, 204, 143, 0.2);
+    }
+
+    #disclaimer {
+      font-family: 'Courier New', Courier, monospace;
+      font-style: italic;
+      color: var(--secondary);
+      margin-top: 1.5rem;
+      padding-top: 0.5rem;
+      border-top: 1px dashed var(--secondary);
+      font-size: 0.9rem;
+      text-align: center;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.3);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal.active { display: flex; }
+
+    .modal-content {
+      background: var(--accent3);
+      border: 3px solid var(--secondary);
+      border-radius: 12px;
+      padding: 1.5rem 2rem;
+      max-width: 320px;
+      text-align: center;
+      box-shadow: 4px 4px 0 #aaa;
+      font-family: 'VT323', monospace;
+      position: relative;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 0.3rem;
+      right: 0.3rem;
+      font-size: 1.2rem;
+      color: var(--secondary);
+      background: var(--accent2);
+      border: 2px solid var(--secondary);
+      border-radius: 50%;
+      cursor: pointer;
+      padding: 0.2rem 0.5rem;
+      font-weight: bold;
+      transition: background 0.2s, transform 0.1s;
+    }
+    .modal-close:hover {
+      background: var(--primary);
+      color: white;
+      transform: translate(-1px,-1px);
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+      color: var(--secondary);
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    .modal-example {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--secondary);
+      background: var(--accent2);
+      border-radius: 6px;
+      padding: 0.5rem;
+    }
+
+    .pixel-divider {
+      height: 4px;
+      background: var(--accent2);
+      margin: 2rem 0;
+      position: relative;
+      border: 2px solid var(--secondary);
+      border-left: none;
+      border-right: none;
+    }
+
+    .pixel-divider::before,
+    .pixel-divider::after {
+      content: '';
+      position: absolute;
+      top: -8px;
+      width: 16px;
+      height: 16px;
+      background: var(--primary);
+      border: 2px solid var(--secondary);
+    }
+
+    .pixel-divider::before {
+      left: 20%;
+    }
+
+    .pixel-divider::after {
+      right: 20%;
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background-color: var(--secondary);
+      color: white;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: 600;
+      border-top: 4px solid var(--accent2);
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.4rem;
+        padding: 1rem;
+      }
+      
+      .hero h1 {
+        font-size: 1.5rem;
+      }
+      
+      .form-group {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Diabetes Risk Predictor
+    <a href="/" class="back-btn">🏠 Home</a>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Diabetes Risk Assessment</h1>
+      <p>Enter your health metrics to receive an instant diabetes risk prediction with personalized recommendations!</p>
+    </section>
+
+    <div class="intro-blurb">
+      <h2 style="text-align: center";>About This Model</h2>
+      <p>This machine learning model analyzes key health indicators to predict diabetes risk. It was trained on clinical data and considers factors like glucose levels, BMI, age, and more. While not a medical diagnosis, it can help identify potential risk factors and guide healthier lifestyle choices.</p>
+    </div>
+
+    <div class="pixel-divider"></div>
+
+    <div class="form-container">
+      <h2>Enter Your Health Information</h2>
+      <p style="text-align: center; margin-bottom: 1.5rem; font-family: 'Courier New', Courier, monospace;">
+        Click on any feature name for more information and examples.
+      </p>
+      
+      <div class="form-group">
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('Pregnancies')">Pregnancies</span>
+          <input type="number" id="Pregnancies" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('Glucose')">Glucose</span>
+          <input type="number" id="Glucose" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('BloodPressure')">Blood Pressure</span>
+          <input type="number" id="BloodPressure" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('SkinThickness')">Skin Thickness</span>
+          <input type="number" id="SkinThickness" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('Insulin')">Insulin</span>
+          <input type="number" id="Insulin" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('BMI')">BMI</span>
+          <input type="number" id="BMI" step="0.1" min="0" required />
+        </label>
+        <label>
+          <span class="feature-label" onclick="showFeaturePopup('Age')">Age</span>
+          <input type="number" id="Age" min="0" required />
+        </label>
+      </div>
+
+      <button class="predict-btn" onclick="getPrediction()">✨ Predict My Risk ✨</button>
+    </div>
+
+    <div class="report" id="report">
+      <div class="result-section">
+        <h3>Prediction Result</h3>
+        <span id="predictedOutcome"></span>
+      </div>
+
+      <div class="pixel-divider"></div>
+
+      <div class="recommendations" id="recommendations">
+        <h3>Personalized Recommendations</h3>
+        <div id="recommendationContent"></div>
+      </div>
+
+      <div class="pixel-divider"></div>
+
+      <div>
+        <h3 style="text-align: center; font-family: 'Press Start 2P', cursive; color: var(--secondary);">Feature Breakdown</h3>
+        <table class="feature-table">
+          <thead>
+            <tr>
+              <th>Feature</th>
+              <th>Your Value</th>
+              <th>Healthy Range</th>
+            </tr>
+          </thead>
+          <tbody id="featureTable"></tbody>
+        </table>
+      </div>
+
+      <p id="disclaimer"></p>
+    </div>
+  </main>
+
+  <!-- Feature Info Modal -->
+  <div class="modal" id="featureModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeFeaturePopup()">&times;</button>
+      <div class="modal-title" id="modalTitle"></div>
+      <div id="modalDesc"></div>
+      <div class="modal-example" id="modalExample"></div>
+    </div>
+  </div>
+
+  <footer>
+    Created by Eva Yu · STEM League Tech Innovators Internship · 2025
+  </footer>
+
+  <script>
+    // Feature definitions with healthy ranges
+    const featurePopups = {
+      Pregnancies: { 
+        title: "Pregnancies", 
+        desc: "Number of times pregnant. Pregnancy can affect glucose metabolism.", 
+        example: "Example: If someone has been pregnant twice, enter 2.",
+        healthyRange: "N/A (depends on individual)"
+      },
+      Glucose: { 
+        title: "Glucose", 
+        desc: "Plasma glucose concentration after 2 hours in an oral glucose tolerance test.", 
+        example: "Normal: <140 mg/dL, Prediabetes: 140-199 mg/dL, Diabetes: ≥200 mg/dL",
+        healthyRange: "Fasting: 70-100 mg/dL\nAfter meals: <140 mg/dL"
+      },
+      BloodPressure: { 
+        title: "Blood Pressure", 
+        desc: "Diastolic blood pressure (mm Hg). High blood pressure is associated with diabetes risk.", 
+        example: "Normal: <80 mmHg, Elevated: 80-89 mmHg, High: ≥90 mmHg",
+        healthyRange: "Below 120/80 mmHg"
+      },
+      SkinThickness: { 
+        title: "Skin Thickness", 
+        desc: "Triceps skin fold thickness (mm). Measures body fat percentage.", 
+        example: "Average: Men 12mm, Women 23mm. Higher values may indicate obesity.",
+        healthyRange: "Men: 10-15mm\nWomen: 20-25mm"
+      },
+      Insulin: { 
+        title: "Insulin", 
+        desc: "2-Hour serum insulin (μU/ml). High levels may indicate insulin resistance.", 
+        example: "Normal fasting insulin: 2-20 μU/mL",
+        healthyRange: "Fasting: 2-20 μU/mL"
+      },
+      BMI: { 
+        title: "BMI", 
+        desc: "Body Mass Index = weight(kg)/height(m)². Higher BMI increases diabetes risk.", 
+        example: "Example: 70kg / (1.75m)² ≈ 22.9 (Healthy weight)",
+        healthyRange: "18.5 - 24.9"
+      },
+      Age: { 
+        title: "Age", 
+        desc: "Age in years. Diabetes risk increases with age, especially after 45.", 
+        example: "Example: 35",
+        healthyRange: "N/A (risk increases after 45)"
+      }
+    };
+
+    function showFeaturePopup(feature) {
+      const modal = document.getElementById("featureModal");
+      document.getElementById("modalTitle").textContent = featurePopups[feature].title;
+      document.getElementById("modalDesc").textContent = featurePopups[feature].desc;
+      document.getElementById("modalExample").textContent = featurePopups[feature].example;
+      modal.classList.add("active");
+    }
+    
+    function closeFeaturePopup() {
+      document.getElementById("featureModal").classList.remove("active");
+    }
+    
+    window.addEventListener("click", function(e) {
+      const modal = document.getElementById("featureModal");
+      if(e.target === modal) closeFeaturePopup();
+    });
+
+    // Generate personalized recommendations based on input values
+    function generateRecommendations(features) {
+      const recommendations = [];
+      
+      // Glucose recommendations
+      if (features[1] > 140) {
+        recommendations.push("Your glucose levels are elevated. Consider reducing sugar intake and increasing physical activity.");
+      } else if (features[1] > 100) {
+        recommendations.push("Your glucose levels are in the prediabetes range. Monitor your carbohydrate intake and consider regular exercise.");
+      }
+      
+      // BMI recommendations
+      if (features[5] >= 25) {
+        recommendations.push("Your BMI indicates you may be overweight. Even a 5-7% weight loss can significantly reduce diabetes risk.");
+      } else if (features[5] < 18.5) {
+        recommendations.push("Your BMI is below the healthy range. Maintain a balanced diet with adequate nutrition.");
+      }
+      
+      // Blood pressure recommendations
+      if (features[2] >= 80) {
+        recommendations.push("Your blood pressure is elevated. Reduce sodium intake and consider regular cardiovascular exercise.");
+      }
+      
+      // Age recommendations
+      if (features[6] > 45) {
+        recommendations.push("As you're over 45, regular diabetes screening is recommended. Maintain a healthy lifestyle with balanced nutrition.");
+      }
+      
+      // General recommendations
+      recommendations.push("Aim for at least 150 minutes of moderate exercise per week.");
+      recommendations.push("Focus on a diet rich in whole grains, vegetables, and lean proteins.");
+      recommendations.push("Limit processed foods, sugary beverages, and saturated fats.");
+      recommendations.push("Get 7-8 hours of quality sleep each night.");
+      recommendations.push("Manage stress through meditation, yoga, or other relaxation techniques.");
+      
+      return recommendations;
+    }
+
+    async function getPrediction() {
+      document.getElementById("predictedOutcome").textContent = "Analyzing...";
+      document.getElementById("report").style.display = "block";
+      document.getElementById("disclaimer").textContent = "";
+
+      try {
+        const features = [
+          parseFloat(document.getElementById("Pregnancies").value),
+          parseFloat(document.getElementById("Glucose").value),
+          parseFloat(document.getElementById("BloodPressure").value),
+          parseFloat(document.getElementById("SkinThickness").value),
+          parseFloat(document.getElementById("Insulin").value),
+          parseFloat(document.getElementById("BMI").value),
+          parseFloat(document.getElementById("Age").value)
+        ];
+
+        // Show loading animation
+        const outcome = document.getElementById("predictedOutcome");
+        outcome.classList.remove("positive-result", "negative-result");
+        
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ features })
+        });
+
+        if (!response.ok) throw new Error(`Server error: ${response.status}`);
+        const result = await response.json();
+        if (!result.prediction || typeof result.prediction[0] !== "number") throw new Error("Invalid prediction received");
+
+        const predictedClass = result.prediction[0];
+        const predictedText = predictedClass === 1 ? "Higher Risk" : "Lower Risk";
+        
+        if (predictedClass === 1) {
+          outcome.textContent = predictedText;
+          outcome.classList.add("positive-result");
+        } else {
+          outcome.textContent = predictedText;
+          outcome.classList.add("negative-result");
+        }
+
+        // Generate and display personalized recommendations
+        const recommendations = generateRecommendations(features);
+        const recommendationContent = document.getElementById("recommendationContent");
+        recommendationContent.innerHTML = "<ul>";
+        recommendations.forEach(rec => {
+          recommendationContent.innerHTML += `<li>${rec}</li>`;
+        });
+        recommendationContent.innerHTML += "</ul>";
+
+        // Populate feature table
+        const featureInfo = [
+          { name: "Pregnancies", tooltip: featurePopups.Pregnancies.desc },
+          { name: "Glucose", tooltip: featurePopups.Glucose.desc },
+          { name: "Blood Pressure", tooltip: featurePopups.BloodPressure.desc },
+          { name: "Skin Thickness", tooltip: featurePopups.SkinThickness.desc },
+          { name: "Insulin", tooltip: featurePopups.Insulin.desc },
+          { name: "BMI", tooltip: featurePopups.BMI.desc },
+          { name: "Age", tooltip: featurePopups.Age.desc }
+        ];
+        
+        const featureTable = document.getElementById("featureTable");
+        featureTable.innerHTML = "";
+        features.forEach((f,i)=>{
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td title="${featureInfo[i].tooltip}">${featureInfo[i].name}</td>
+            <td>${f}</td>
+            <td>${featurePopups[Object.keys(featurePopups)[i]].healthyRange}</td>
+          `;
+          featureTable.appendChild(row);
+        });
+
+        document.getElementById("disclaimer").textContent = "Disclaimer: This is not a professional medical diagnosis. Consult a healthcare professional for medical advice. Results are based on a machine learning model and should be used for informational purposes only.";
+
+      } catch (err) {
+        console.error(err);
+        const outcome = document.getElementById("predictedOutcome");
+        outcome.textContent = "Error";
+        outcome.classList.add("positive-result");
+        document.getElementById("disclaimer").textContent = err.message;
+      }
+    }
+  </script>
+</body>
+</html>
